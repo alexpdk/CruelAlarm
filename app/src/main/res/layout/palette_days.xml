@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/llPalette"
+    android:weightSum="7">
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="П"
+        android:id="@+id/tvMonday"/>
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="В"
+        android:id="@+id/tvTuesday"/>
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="С"
+        android:id="@+id/tvWednesday"/>
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="Ч"
+        android:id="@+id/tvThursday"/>
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="П"
+        android:id="@+id/tvFriday"/>
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="С"
+        android:id="@+id/tvSaturday"/>
+
+    <TextView
+        style="@style/WeekDay"
+        android:text="В"
+        android:id="@+id/tvSunday"/>
+</LinearLayout>

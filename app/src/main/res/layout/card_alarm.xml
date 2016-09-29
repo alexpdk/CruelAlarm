@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_marginTop="10dp"
+    android:layout_width="match_parent"
+    android:background="#ffffff"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_clear_black_18dp"
+        android:background="@null"
+        android:layout_gravity="end"
+        android:id="@+id/btnClear" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_alarm_black_48dp"
+            android:id="@+id/imgAlarm" />
+
+        <TextView
+            android:text="22:00"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="48sp"
+            android:id="@+id/tvTime"/>
+    </LinearLayout>
+
+    <TextView
+        android:text="Пн Вт Ср Чт Пт Сб Вс"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvDays" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_keyboard_arrow_down_black_18dp"
+        android:background="@null"
+        android:layout_gravity="end"
+        android:id="@+id/imgChevron" />
+
+    <include layout="@layout/card_alarm_expanded"
+        android:id="@+id/incExpanded"
+        android:visibility="gone"/>
+</LinearLayout>
