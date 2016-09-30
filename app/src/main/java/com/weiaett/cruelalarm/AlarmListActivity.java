@@ -65,7 +65,7 @@ public class AlarmListActivity extends AppCompatActivity {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 if (dy > 0 && fab.isShown())
                     fab.hide();
-                if (dy < 0 && !fab.isShown())
+                if (dy <= 0 && !fab.isShown())
                     fab.show();
             }
         });

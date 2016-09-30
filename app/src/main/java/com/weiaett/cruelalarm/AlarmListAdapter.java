@@ -26,7 +26,6 @@ import android.widget.TimePicker;
 
 import com.weiaett.cruelalarm.graphics.ColorCircleDrawable;
 import com.weiaett.cruelalarm.models.Alarm;
-import com.weiaett.cruelalarm.utils.DBHelper;
 import com.weiaett.cruelalarm.utils.Utils;
 
 import java.util.Calendar;
@@ -40,8 +39,10 @@ import static com.weiaett.cruelalarm.R.id.tvTime;
  * Adapter for alarm list
  */
 
-class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder> {
+class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final int VIEW_TYPE_EMPTY_LIST_PLACEHOLDER = 0;
+    private static final int VIEW_TYPE_LIST_VIEW = 1;
     private List<Alarm> alarms;
     private Context context;
     private RecyclerView recyclerView;
@@ -55,33 +56,56 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_alarm, parent, false);
-        context = parent.getContext();
-        return new ViewHolder(view);
+    public int getItemViewType(int position) {
+        return alarms.isEmpty() ? VIEW_TYPE_EMPTY_LIST_PLACEHOLDER : VIEW_TYPE_LIST_VIEW;
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.item = alarms.get(position);
-        bindActiveDayView(holder);
-        bindPalette(holder);
-        holder.timeView.setText(holder.item.getTime());
-        holder.toneView.setText(holder.item.getTone());
-        holder.descriptionView.setText(holder.item.getDescription());
-        holder.vibrationView.setChecked(holder.item.getHasVibration());
-        holder.activateAlarmView.setColorFilter(holder.item.getIsActive() ?
-                context.getResources().getColor(R.color.colorAccent) :
-                context.getResources().getColor(R.color.colorNotActive));
-        if (expandedAlarmPosition == position && holder.expandableViewPart.getVisibility() == View.GONE) {
-            Utils.expand(holder.expandableViewPart);
-        } else if (expandedAlarmPosition != position && holder.expandableViewPart.getVisibility() == View.VISIBLE) {
-            holder.expandableViewPart.setVisibility(View.GONE);
+    public int getItemCount() {
+        return alarms.isEmpty() ? 1 : alarms.size();
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
+        View view;
+        switch(viewType) {
+            case VIEW_TYPE_EMPTY_LIST_PLACEHOLDER:
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.empty_alarm_list_placeholder, parent, false);
+                return new EmptyViewHolder(view);
+            default:
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.card_alarm, parent, false);
+                return new ListViewHolder(view);
         }
     }
 
-    private void bindActiveDayView(ViewHolder holder) {
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+        switch(getItemViewType(position)) {
+            case VIEW_TYPE_EMPTY_LIST_PLACEHOLDER:
+                break;
+            case VIEW_TYPE_LIST_VIEW:
+                ((ListViewHolder) holder).item = alarms.get(position);
+                bindActiveDayView((ListViewHolder) holder);
+                bindPalette((ListViewHolder) holder);
+                ((ListViewHolder) holder).timeView.setText(((ListViewHolder) holder).item.getTime());
+                ((ListViewHolder) holder).toneView.setText(((ListViewHolder) holder).item.getTone());
+                ((ListViewHolder) holder).descriptionView.setText(((ListViewHolder) holder).item.getDescription());
+                ((ListViewHolder) holder).vibrationView.setChecked(((ListViewHolder) holder).item.getHasVibration());
+                ((ListViewHolder) holder).activateAlarmView.setColorFilter(((ListViewHolder) holder).item.getIsActive() ?
+                        context.getResources().getColor(R.color.colorAccent) :
+                        context.getResources().getColor(R.color.colorNotActive));
+                if (expandedAlarmPosition == position && ((ListViewHolder) holder).expandableViewPart.getVisibility() == View.GONE) {
+                    Utils.expand(((ListViewHolder) holder).expandableViewPart);
+                } else if (expandedAlarmPosition != position && ((ListViewHolder) holder).expandableViewPart.getVisibility() == View.VISIBLE) {
+                    ((ListViewHolder) holder).expandableViewPart.setVisibility(View.GONE);
+                }
+        }
+    }
+
+    private void bindActiveDayView(ListViewHolder holder) {
         SpannableStringBuilder builder = new SpannableStringBuilder();
         if (!holder.item.getDays().isEmpty()) {
             if (holder.item.getDays().size() == 7) {
@@ -116,7 +140,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
         }
     }
 
-    private void bindPalette(ViewHolder holder) {
+    private void bindPalette(ListViewHolder holder) {
         for (WeekDay day : WeekDay.values()) {
             TextView tvWeekday = (TextView) holder.paletteView.getChildAt(day.ordinal());
             if (holder.item.getDays().contains(day)) {
@@ -126,11 +150,6 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
                 tvWeekday.setBackground(null);
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return alarms.size();
     }
 
     private void accentChangedAlarm(Alarm alarm) {
@@ -152,7 +171,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
             final Uri uri = ringtoneIntent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             final String ringtoneTitle = RingtoneManager.getRingtone(context, uri).getTitle(context);
             if (waitingForToneAlarmPosition != -1) {
-                ViewHolder holder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(waitingForToneAlarmPosition);
+                ListViewHolder holder = (ListViewHolder) recyclerView.findViewHolderForAdapterPosition(waitingForToneAlarmPosition);
                 holder.item.setTone(ringtoneTitle);
                 holder.item.setToneUri(uri);
                 holder.toneView.setText(ringtoneTitle);
@@ -161,7 +180,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
         }
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    private class ListViewHolder extends RecyclerView.ViewHolder {
         Alarm item;
         final View parentView;
         final View expandableViewPart;
@@ -176,7 +195,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
         final TextView photoView;
         final EditText descriptionView;
 
-        ViewHolder(View view) {
+        ListViewHolder(View view) {
             super(view);
             this.parentView = view;
             expandableViewPart = view.findViewById(R.id.incExpanded);
@@ -310,17 +329,23 @@ class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder>
                         if (item.getDays().contains(weekDay)) {
                             view.setBackground(null);
                             item.removeDay(weekDay);
-                            AlarmListAdapter.this.bindActiveDayView(ViewHolder.this);
+                            AlarmListAdapter.this.bindActiveDayView(ListViewHolder.this);
                         } else {
                             view.setBackground(new ColorCircleDrawable(context.getResources().
                                     getColor(R.color.colorAccent)));
                             item.addDay(weekDay);
-                            AlarmListAdapter.this.bindActiveDayView(ViewHolder.this);
+                            AlarmListAdapter.this.bindActiveDayView(ListViewHolder.this);
                         }
                         item.updateInDatabase();
                     }
                 });
             }
+        }
+    }
+
+    private class EmptyViewHolder extends RecyclerView.ViewHolder {
+        EmptyViewHolder(View view) {
+            super(view);
         }
     }
 }
