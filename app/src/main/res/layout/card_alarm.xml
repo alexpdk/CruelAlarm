@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_marginTop="10dp"
     android:layout_width="match_parent"
-    android:background="#ffffff"
+    android:background="@color/colorWhite"
     android:layout_height="wrap_content">
 
     <ImageButton
@@ -26,6 +26,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             app:srcCompat="@drawable/ic_alarm_black_48dp"
             android:id="@+id/imgAlarm" />
 

@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import com.weiaett.cruelalarm.graphics.ColorCircleDrawable;
 import com.weiaett.cruelalarm.models.Alarm;
 import com.weiaett.cruelalarm.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -43,6 +45,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_EMPTY_LIST_PLACEHOLDER = 0;
     private static final int VIEW_TYPE_LIST_VIEW = 1;
+    private SparseBooleanArray selectedItems;
     private List<Alarm> alarms;
     private Context context;
     private RecyclerView recyclerView;
@@ -52,6 +55,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     AlarmListAdapter(List<Alarm> alarms, RecyclerView recyclerView) {
         this.alarms = alarms;
         this.recyclerView = recyclerView;
+        selectedItems = new SparseBooleanArray();
         Utils.sortAlarms(alarms);
     }
 
@@ -88,8 +92,15 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 break;
             case VIEW_TYPE_LIST_VIEW:
                 ((ListViewHolder) holder).item = alarms.get(position);
+                ((ListViewHolder) holder).parentView.setBackground(isSelectionMode() ?
+                        context.getResources().getDrawable(R.drawable.alarm_card_background_action_mode) :
+                        context.getResources().getDrawable(R.drawable.alarm_card_background));
+                ((ListViewHolder) holder).parentView.setActivated(selectedItems.get(position, false));
                 bindActiveDayView((ListViewHolder) holder);
                 bindPalette((ListViewHolder) holder);
+                ((ListViewHolder) holder).clearAlarmView.setVisibility(isSelectionMode() ? View.INVISIBLE : View.VISIBLE);
+                ((ListViewHolder) holder).expandAlarmView.setVisibility(isSelectionMode() ? View.INVISIBLE : View.VISIBLE);
+                ((ListViewHolder) holder).clearAlarmView.setClickable(!isSelectionMode());
                 ((ListViewHolder) holder).timeView.setText(((ListViewHolder) holder).item.getTime());
                 ((ListViewHolder) holder).toneView.setText(((ListViewHolder) holder).item.getTone());
                 ((ListViewHolder) holder).descriptionView.setText(((ListViewHolder) holder).item.getDescription());
@@ -160,6 +171,16 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         recyclerView.smoothScrollToPosition(position);
     }
 
+    private void deleteAlarm(Alarm alarm) {
+        alarm.deleteFromDatabase();
+        notifyItemRemoved(alarms.indexOf(alarm));
+        alarms.remove(alarm);
+    }
+
+    void deleteAlarm(int position) {
+        deleteAlarm(alarms.get(position));
+    }
+
     void addAlarm(Alarm alarm) {
         alarm.addToDatabase();
         alarms.add(alarm);
@@ -178,6 +199,74 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 holder.item.updateInDatabase();
             }
         }
+    }
+
+    private boolean isSelectionMode() {
+        return ((AlarmListActivity) context).isInActionMode();
+    }
+
+    void toggleSelection(int position) {
+        if (selectedItems.get(position, false)) {
+            selectedItems.delete(position);
+        }
+        else if (position >= 0) {
+            selectedItems.put(position, true);
+        }
+        notifyItemChanged(position);
+    }
+
+    void clearSelections() {
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    void selectAll() {
+        for (int i = 0; i < alarms.size(); i++) {
+            selectedItems.put(i, true);
+        }
+        notifyDataSetChanged();
+    }
+
+    int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+
+    int getChildrenCount() {
+        return alarms.size();
+    }
+
+    void performClickOnAlarmCard(int position) {
+        toggleExpanding(((ListViewHolder)recyclerView.findViewHolderForAdapterPosition(position)));
+    }
+
+    private void toggleExpanding(ListViewHolder holder) {
+        if (holder.expandableViewPart.getVisibility() == View.GONE) {
+            holder.expandAlarmView.setVisibility(View.INVISIBLE);
+            AlarmListAdapter.this.recyclerView.smoothScrollToPosition(holder.getLayoutPosition());
+            notifyItemChanged(expandedAlarmPosition);
+            expandedAlarmPosition = holder.getAdapterPosition();
+            notifyItemChanged(expandedAlarmPosition);
+        } else {
+            expandedAlarmPosition = -1;
+            Utils.collapse(holder.expandableViewPart);
+            holder.expandAlarmView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    void closeExpanded() {
+        if (expandedAlarmPosition != -1) {
+            Utils.collapse(((ListViewHolder)recyclerView.
+                    findViewHolderForAdapterPosition(expandedAlarmPosition)).expandableViewPart);
+            expandedAlarmPosition = -1;
+        }
+    }
+
+    List<Integer> getSelectedItems() {
+        List<Integer> items = new ArrayList<>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
     }
 
     private class ListViewHolder extends RecyclerView.ViewHolder {
@@ -214,29 +303,16 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setupListeners() {
-            parentView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (expandableViewPart.getVisibility() == View.GONE) {
-                        expandAlarmView.setVisibility(View.INVISIBLE);
-                        AlarmListAdapter.this.recyclerView.smoothScrollToPosition(getLayoutPosition());
-                        notifyItemChanged(expandedAlarmPosition);
-                        expandedAlarmPosition = getAdapterPosition();
-                        notifyItemChanged(expandedAlarmPosition);
-                    } else {
-                        expandedAlarmPosition = -1;
-                        Utils.collapse(expandableViewPart);
-                        expandAlarmView.setVisibility(View.VISIBLE);
-                    }
-                }
-            });
-
+//            parentView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    toggleExpanding(ListViewHolder.this);
+//                }
+//            });
             clearAlarmView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    item.deleteFromDatabase();
-                    alarms.remove(getAdapterPosition());
-                    notifyItemRemoved(getAdapterPosition());
+                    deleteAlarm(item);
                 }
             });
 

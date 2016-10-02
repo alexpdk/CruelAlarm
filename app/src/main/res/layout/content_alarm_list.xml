@@ -15,7 +15,6 @@
     tools:context="com.weiaett.cruelalarm.AlarmListActivity"
     android:scrollbars="vertical"
     tools:listitem="@layout/card_alarm"
-    android:background="#cccccc"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_alarm_list">
 </android.support.v7.widget.RecyclerView>

@@ -48,7 +48,7 @@ public class Utils {
 
     public static void expand(final View view) {
         view.setVisibility(View.VISIBLE);
-        int finalHeight = 300; // TODO: get real height
+        int finalHeight = 310; // TODO: get real height
         ValueAnimator animator = slideAnimator(view, 0, finalHeight);
         animator.addListener(new Animator.AnimatorListener() {
             @Override
