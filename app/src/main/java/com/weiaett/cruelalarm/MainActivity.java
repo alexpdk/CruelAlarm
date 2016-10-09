@@ -4,30 +4,72 @@ import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ImageView matchView;
+    private ImageComparator comparator;
+
+    private static int[] images = new int[]{R.drawable.s2, R.drawable.s3, R.drawable.oven1, R.drawable.oven2};
+
+    private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                    Log.i("OpenCV", "OpenCV loaded successfully");
+                    break;
+                default:
+                    super.onManagerConnected(status);
+                    Log.i("OpenCV", "Something went wrong with OpenCV loading");
+                    return;
+            }
+            comparator = new ImageComparator();
+            matchView = (ImageView) findViewById(R.id.imageView2);
+            showMatch(images[0]);
+
+            (findViewById(R.id.nextImageButton)).setOnClickListener(matchNextImage);
+        }
+    };
+
+    View.OnClickListener matchNextImage = new View.OnClickListener() {
+
+        private int imgCounter = 0;
+
+        @Override
+        public void onClick(View v) {
+            imgCounter++;
+            if(imgCounter < images.length) showMatch(images[imgCounter]);
+        }
+    };
+
     static{
-        // TODO test whether it works without explicit loadLibrary
-        System.loadLibrary("opencv_java");
-        if(!OpenCVLoader.initDebug()) {
+        // System.loadLibrary("opencv_java");
+
+       /* if(!OpenCVLoader.initDebug()) {
             Log.e("OpenCV","OpenCV initialization error");
         }
-        else Log.i("OpenCV", "OpenCV initialized correctly");
+        else Log.i("OpenCV", "OpenCV initialized correctly");*/
     }
+
+    protected void showMatch(int imgID){
+        Bitmap match = comparator.matchImages(getApplicationContext(), R.drawable.oven1, imgID);
+        matchView.setImageBitmap(match);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageComparator comparator = new ImageComparator();
-        Bitmap match = comparator.matchImages(getApplicationContext(), R.drawable.s1, R.drawable.s3);
-
-        ImageView img = (ImageView) findViewById(R.id.imageView2);
-        img.setImageBitmap(match);
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_11, this, loaderCallback);
 
 //        Intent snippet: not working, because  storage size is 1MB.
 //        Internal device memory required as a temporary bitmap storage
