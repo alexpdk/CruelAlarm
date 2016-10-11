@@ -1,11 +1,13 @@
 package com.weiaett.cruelalarm.models;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
+import com.weiaett.cruelalarm.R;
 import com.weiaett.cruelalarm.utils.DBHelper;
-import com.weiaett.cruelalarm.WeekDay;
+import com.weiaett.cruelalarm.Weekday;
 
 import java.util.EnumSet;
 
@@ -15,11 +17,11 @@ import java.util.EnumSet;
  */
 public class Alarm {
 
-    private EnumSet<WeekDay> days = EnumSet.noneOf(WeekDay.class);
+    private EnumSet<Weekday> days = EnumSet.noneOf(Weekday.class);
 
     private int id;
     private boolean isActive = true;
-    private Uri toneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+    private Uri toneUri;
     private String tone = "По умолчанию";
     private boolean hasVibration = false;
     private String description = "";
@@ -27,12 +29,18 @@ public class Alarm {
     private Context context;
 
     public Alarm(Context context, String time) {
-        this.time = time;
+        SharedPreferences config = context.getSharedPreferences(context.
+                getString(com.weiaett.cruelalarm.R.string.sp_config), Context.MODE_PRIVATE);
         this.context = context;
+        this.time = time;
+        this.toneUri = Uri.parse(config.getString(context.getString(com.weiaett.cruelalarm.R.string.sp_config_tone_uri),
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString()));
+        this.tone = RingtoneManager.getRingtone(context, this.toneUri).getTitle(context);
+        this.hasVibration = config.getBoolean(context.getString(com.weiaett.cruelalarm.R.string.sp_config_vibration), false);
     }
 
     public Alarm(Context context) {
-        this.context = context;
+        this(context, context.getString(R.string.time_default));
     }
 
     public int getId() {
@@ -91,15 +99,15 @@ public class Alarm {
         this.description = description;
     }
 
-    public EnumSet<WeekDay> getDays() {
+    public EnumSet<Weekday> getDays() {
         return days;
     }
 
-    public void addDay(WeekDay day){
+    public void addDay(Weekday day){
         days.add(day);
     }
 
-    public void removeDay(WeekDay day) {
+    public void removeDay(Weekday day) {
         days.remove(day);
     }
 

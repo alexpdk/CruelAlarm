@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.util.Log;
 
-import com.weiaett.cruelalarm.WeekDay;
+import com.weiaett.cruelalarm.Weekday;
 import com.weiaett.cruelalarm.models.Alarm;
 
 import java.util.ArrayList;
@@ -163,7 +163,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             if (cursor.moveToFirst()) {
                 do {
-                    alarm.addDay(WeekDay.values()[cursor.getInt(cursor.getColumnIndex(String.
+                    alarm.addDay(Weekday.values()[cursor.getInt(cursor.getColumnIndex(String.
                             format("%1$s", COLUMN_DAY)))]);
                 } while(cursor.moveToNext());
             }
@@ -175,46 +175,6 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
     }
-
-//    public List<Alarm> getAllAlarms(Context context) {
-//        List<Alarm> alarms = new ArrayList<>();
-//        String ALARMS_SELECT_QUERY =
-//                String.format("SELECT * FROM %1$s INNER JOIN %2$s " +
-//                                "ON %1$s.%3$s = %2$s.%3$s ORDER BY %1$s.%4$s ASC;",
-//                        ALARM_TABLE, DAY_ALARM_TABLE, COLUMN_ALARM_ID, COLUMN_ALARM_TIME);
-//        SQLiteDatabase db = getReadableDatabase();
-//        Cursor cursor = db.rawQuery(ALARMS_SELECT_QUERY, null);
-//        try {
-//            if (cursor.moveToFirst()) {
-//                do {
-//                    Alarm newAlarm = new Alarm(context);
-//                    newAlarm.setId(cursor.getInt(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_ID))));
-//                    newAlarm.setTime(cursor.getString(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_TIME))));
-//                    newAlarm.setIsActive(cursor.getInt(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_IS_ACTIVE))) > 0);
-//                    newAlarm.setTone(cursor.getString(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_TONE))));
-//                    newAlarm.setToneUri(Uri.parse(cursor.getString(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_TONE_URI)))));
-//                    newAlarm.setHasVibration(cursor.getInt(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_HAS_VIBRATION))) > 0);
-//                    newAlarm.setDescription(cursor.getString(cursor.getColumnIndex(String.
-//                            format("%1$s.%2$s", ALARM_TABLE, COLUMN_ALARM_DESCRIPTION))));
-//                    //ADD DAYS
-//                    alarms.add(newAlarm);
-//                } while(cursor.moveToNext());
-//            }
-//        } catch (Exception e) {
-//            Log.d(TAG, e.getMessage());
-//        } finally {
-//            if (cursor != null && !cursor.isClosed()) {
-//                cursor.close();
-//            }
-//        }
-//        return alarms;
-//    }
 
     public void addAlarm(Alarm alarm) {
         SQLiteDatabase db = getWritableDatabase();
@@ -253,7 +213,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         String activeDays = "";
-        for (WeekDay day: alarm.getDays()) {
+        for (Weekday day: alarm.getDays()) {
             String sql = "INSERT OR REPLACE INTO " + DAY_ALARM_TABLE +" VALUES (?,?);";
             SQLiteStatement statement = db.compileStatement(sql);
             statement.clearBindings();

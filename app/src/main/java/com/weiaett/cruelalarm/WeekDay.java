@@ -5,7 +5,7 @@ package com.weiaett.cruelalarm;
  * Days of a week enumeration
  */
 
-public enum WeekDay {
+public enum Weekday {
     MONDAY,
     TUESDAY,
     WEDNESDAY,

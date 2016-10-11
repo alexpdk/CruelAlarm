@@ -1,10 +1,14 @@
-package com.weiaett.cruelalarm;
+package com.weiaett.cruelalarm.alarm_list;
 
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,8 +20,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.weiaett.cruelalarm.R;
+import com.weiaett.cruelalarm.SettingsActivity;
 import com.weiaett.cruelalarm.graphics.SmoothLLManager;
 import com.weiaett.cruelalarm.models.Alarm;
 import com.weiaett.cruelalarm.utils.DBHelper;
@@ -30,8 +38,12 @@ import java.util.List;
 public class AlarmListActivity extends AppCompatActivity
         implements RecyclerView.OnItemTouchListener {
 
+    static final int TONE_PICKER_ROOT_ADAPTER = 0;
+    static final int TONE_PICKER_ROOT_SETTINGS = 1;
+
     private AlarmListAdapter alarmListAdapter;
     private GestureDetectorCompat gestureDetector;
+    private RecyclerViewOnGestureListener recyclerViewOnGestureListener;
     private ActionMode actionMode;
     private RecyclerView recyclerView;
 
@@ -47,13 +59,13 @@ public class AlarmListActivity extends AppCompatActivity
         recyclerView.setAdapter(alarmListAdapter);
 
         recyclerView.addOnItemTouchListener(this);
-        gestureDetector =
-                new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-
+        recyclerViewOnGestureListener = new RecyclerViewOnGestureListener();
+        gestureDetector = new GestureDetectorCompat(this, recyclerViewOnGestureListener);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setActionBarTitle(getString(R.string.app_name));
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle(getString(R.string.app_name));
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +81,7 @@ public class AlarmListActivity extends AppCompatActivity
                                 calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
                                 calendar.set(Calendar.MINUTE, selectedMinute);
                                 alarmListAdapter.addAlarm(new Alarm(AlarmListActivity.this,
-                                        Utils.getFormattedTime(calendar)));
+                                        Utils.getFormattedTime(AlarmListActivity.this, calendar)));
                             }
                         }, hour, minute, true);
                 timePickerDialog.show();
@@ -98,13 +110,26 @@ public class AlarmListActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent ringtoneIntent) {
-        alarmListAdapter.onActivityResult(requestCode, resultCode, ringtoneIntent);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(AlarmListActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-    public void setActionBarTitle(String title) {
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setTitle(title);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent ringtoneIntent) {
+       switch (requestCode) {
+            case TONE_PICKER_ROOT_ADAPTER:
+                alarmListAdapter.onActivityResult(resultCode, ringtoneIntent);
+                break;
+            case TONE_PICKER_ROOT_SETTINGS:
+                recyclerViewOnGestureListener.onActivityResult(resultCode, ringtoneIntent);
+                break;
+        }
     }
 
     boolean isInActionMode() {
@@ -136,8 +161,69 @@ public class AlarmListActivity extends AppCompatActivity
     }
 
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        private Uri commonRingtoneUri = null;
+        private String commonRingtoneTitle = null;
+
+        final View dialogView = getLayoutInflater().inflate(R.layout.dialog_bulk_alarm_settings, null);
+        final TextView toneView = (TextView) dialogView.findViewById(R.id.tvTone);
+        final TextView toneViewLabel = (TextView) dialogView.findViewById(R.id.tvToneLabel);
+        final Switch vibrationView = (Switch) dialogView.findViewById(R.id.switchVibration);
+        final TextView photoView = (TextView) dialogView.findViewById(R.id.tvPhotoManager);
+        final AlertDialog dialog;
+        List<Integer> selectedItemPositions;
+
+        RecyclerViewOnGestureListener() {
+            photoView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: call photo picker dialog
+                }
+            });
+
+            toneView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Utils.callTonePicker(AlarmListActivity.this,
+                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), 1);
+                }
+            });
+            toneViewLabel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Utils.callTonePicker(AlarmListActivity.this,
+                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), 1);
+                }
+            });
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(AlarmListActivity.this);
+            builder.setView(dialogView)
+                    .setTitle("Настройки")
+                    .setNegativeButton("Отмена", null)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+                                alarmListAdapter.setAlarmParams(selectedItemPositions.get(i),
+                                        commonRingtoneUri, commonRingtoneTitle, vibrationView.isChecked());
+                            }
+                            actionMode.finish();
+                        }
+                    });
+            dialog = builder.create();
+        }
+
+        void onActivityResult(int resultCode, Intent ringtoneIntent) {
+            if (resultCode == RESULT_OK) {
+                commonRingtoneUri = ringtoneIntent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                commonRingtoneTitle = RingtoneManager.getRingtone(AlarmListActivity.this,
+                        commonRingtoneUri).getTitle(AlarmListActivity.this);
+                toneView.setText(commonRingtoneTitle);
+            }
+        }
+
         @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
+        public boolean onDown(MotionEvent e) {
             View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
             if (view != null) {
                 view.setOnClickListener(new View.OnClickListener() {
@@ -151,14 +237,15 @@ public class AlarmListActivity extends AppCompatActivity
                     }
                 });
             }
-            return super.onSingleTapConfirmed(e);
+            return super.onDown(e);
         }
 
+        @Override
         public void onLongPress(MotionEvent e) {
-            View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-            if (alarmListAdapter.getChildrenCount() == 0 || actionMode != null) {
+            if (alarmListAdapter.getAlarmsCount() == 0 || actionMode != null) {
                 return;
             }
+            View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
             actionMode = startSupportActionMode(new ActionMode.Callback(){
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -186,7 +273,7 @@ public class AlarmListActivity extends AppCompatActivity
 
                 @Override
                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                    List<Integer> selectedItemPositions = alarmListAdapter.getSelectedItems();
+                    selectedItemPositions = alarmListAdapter.getSelectedItems();
                     switch (menuItem.getItemId()) {
                         case R.id.action_delete:
                             for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
@@ -195,7 +282,7 @@ public class AlarmListActivity extends AppCompatActivity
                             actionMode.finish();
                             return true;
                         case R.id.action_select:
-                            if (selectedItemPositions.size() < alarmListAdapter.getChildrenCount()) {
+                            if (selectedItemPositions.size() < alarmListAdapter.getAlarmsCount()) {
                                 alarmListAdapter.selectAll();
                                 actionMode.setTitle("Выбрано: " + alarmListAdapter.getSelectedItemCount());
                             } else {
@@ -203,6 +290,8 @@ public class AlarmListActivity extends AppCompatActivity
                                 actionMode.finish();
                             }
                             return true;
+                        case R.id.action_settings:
+                            dialog.show();
                         default:
                             return false;
                     }
@@ -211,7 +300,6 @@ public class AlarmListActivity extends AppCompatActivity
             toggleSelection(recyclerView.getChildAdapterPosition(view));
             alarmListAdapter.closeExpanded();
             alarmListAdapter.notifyDataSetChanged();
-            // TODO: change bg & hide buttons for all children
             super.onLongPress(e);
         }
     }

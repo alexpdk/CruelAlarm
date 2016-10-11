@@ -7,37 +7,37 @@
     android:weightSum="7">
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="П"
         android:id="@+id/tvMonday"/>
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="В"
         android:id="@+id/tvTuesday"/>
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="С"
         android:id="@+id/tvWednesday"/>
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="Ч"
         android:id="@+id/tvThursday"/>
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="П"
         android:id="@+id/tvFriday"/>
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="С"
         android:id="@+id/tvSaturday"/>
 
     <TextView
-        style="@style/WeekDay"
+        style="@style/Weekday"
         android:text="В"
         android:id="@+id/tvSunday"/>
 </LinearLayout>
