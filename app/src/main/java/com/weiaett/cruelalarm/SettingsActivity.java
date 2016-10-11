@@ -1,9 +1,11 @@
 package com.weiaett.cruelalarm;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -17,11 +19,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.weiaett.cruelalarm.utils.Utils;
+
+import org.antlr.runtime.RecognitionException;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -45,7 +51,6 @@ public class SettingsActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Настройки");
         }
 
         tvToneLabel = (TextView) findViewById(R.id.tvToneLabel);
@@ -56,9 +61,12 @@ public class SettingsActivity extends AppCompatActivity {
         tvAbout = (TextView) findViewById(R.id.tvAbout);
         config = this.getSharedPreferences(this.getString(R.string.sp_config), Context.MODE_PRIVATE);
 
-        tvTone.setText(config.getString(this.getString(R.string.sp_config_tone), getString(com.weiaett.cruelalarm.R.string.label_default)));
+        tvTone.setText(config.getString(this.getString(R.string.sp_config_tone),
+                getString(com.weiaett.cruelalarm.R.string.label_default)));
         swHasVibration.setChecked(config.getBoolean(this.getString(R.string.sp_config_vibration), false));
-        tvInterval.setText(String.format(this.getString(R.string.formatted_interval), (config.getString(this.getString(R.string.sp_config_interval), getString(com.weiaett.cruelalarm.R.string.default_interval)))));
+        tvInterval.setText(String.format(this.getString(R.string.formatted_interval),
+                (config.getString(this.getString(R.string.sp_config_interval),
+                        getString(com.weiaett.cruelalarm.R.string.default_interval)))));
 
         setupViews();
     }
@@ -126,6 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
         tvAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                callAboutDialog();
             }
         });
     }
@@ -144,7 +153,8 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = config.edit();
                 editor.putString(getBaseContext().getString(R.string.sp_config_interval), Integer.toString(numberPicker.getValue()));
                 editor.apply();
-                tvInterval.setText(String.format(getBaseContext().getString(R.string.formatted_interval), numberPicker.getValue()));
+                tvInterval.setText(String.format(getBaseContext().getString(R.string.formatted_interval),
+                        Integer.toString(numberPicker.getValue())));
             }
         });
         builder.setNegativeButton(com.weiaett.cruelalarm.R.string.button_negative, new DialogInterface.OnClickListener() {
@@ -157,6 +167,43 @@ public class SettingsActivity extends AppCompatActivity {
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER));
+        builder.setView(parent);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    void callAboutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton(com.weiaett.cruelalarm.R.string.button_positive, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        final LinearLayout parent = new LinearLayout(this);
+        parent.setOrientation(LinearLayout.VERTICAL);
+        final ImageView logo = new ImageView(this);
+        final TextView title = new TextView(this);
+        final TextView version = new TextView(this);
+        logo.setImageDrawable(this.getResources().getDrawable(R.mipmap.ic_launcher));
+        title.setText(R.string.label_copyright);
+        title.setTextSize(18);
+        String versionName = "1";
+        try {
+             versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        version.setText(String.format(this.getString(R.string.label_version), versionName));
+        version.setTextSize(14);
+        parent.addView(logo);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.weight = 1.0f;
+        params.gravity = Gravity.CENTER;
+        parent.addView(title, params);
+        parent.addView(version, params);
+        builder.setTitle("О программе");
         builder.setView(parent);
         AlertDialog dialog = builder.create();
         dialog.show();
