@@ -16,7 +16,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView matchView;
     private ImageComparator comparator;
 
-    private static int[] images = new int[]{R.drawable.s2, R.drawable.s3, R.drawable.oven1, R.drawable.oven2};
+    private static int[] images = new int[]{R.drawable.tv1,
+            R.drawable.large1, R.drawable.large2, R.drawable.large3,
+            R.drawable.small1, R.drawable.small2, R.drawable.small3,
+            R.drawable.flower1, R.drawable.flower2, R.drawable.flower3,
+            R.drawable.packet1, R.drawable.packet2, R.drawable.packet3,
+            R.drawable.oven3, R.drawable.oven2, R.drawable.wm1, R.drawable.wm2, R.drawable.b_oven1};
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -59,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void showMatch(int imgID){
-        Bitmap match = comparator.matchImages(getApplicationContext(), R.drawable.oven1, imgID);
+        Bitmap match = comparator.matchImages(getApplicationContext(), R.drawable.large1, imgID);
         matchView.setImageBitmap(match);
     }
 
