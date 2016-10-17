@@ -16,6 +16,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".PreviewActivity"></activity>
+        <service
+            android:name=".ComparatorService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
