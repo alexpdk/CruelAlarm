@@ -3,6 +3,7 @@ package com.weiaett.cruelalarm;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.opencv.android.Utils;
@@ -33,6 +34,9 @@ public class ImageComparator {
     private static String TEST = "Test2";
     private static String MATCH = "Match";
 
+    private Mat img1, img2;
+    private MatOfKeyPoint kPoints1, kPoints2;
+
     private Mat loadImage(Context ctx, int drawableID){
 
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -53,7 +57,7 @@ public class ImageComparator {
         return matC3;
     }
 
-    private MatOfDMatch selectGoodMatches(ArrayList<MatOfDMatch> mat, MatOfKeyPoint k1,MatOfKeyPoint k2){
+    private MatOfDMatch selectGoodMatches(ArrayList<MatOfDMatch> mat){
         //Log.d(MATCH, String.format("Dims=%d rows=%d cols=%d total=%d", mat.dims(), mat.rows(), mat.cols(), mat.total()));
 
         DMatch[][] matches = new DMatch[mat.size()][];
@@ -63,8 +67,8 @@ public class ImageComparator {
         int PairNum = matches.length;
         int OptionNum = matches[0].length;
 
-        KeyPoint[] keypoints1 = k1.toArray();
-        KeyPoint[] keypoints2 = k2.toArray();
+        KeyPoint[] keypoints1 = kPoints1.toArray();
+        KeyPoint[] keypoints2 = kPoints2.toArray();
 
         Log.d(MATCH, String.format("Matches options=%d pairs=%d", OptionNum, PairNum));
 
@@ -77,26 +81,65 @@ public class ImageComparator {
         Log.d(MATCH, String.format("For best pair row min=%f max=%f", min, max));
 
         ArrayList<DMatch> good = new ArrayList<>();
-        final double MATCH_AREA = 500.0;
+        final double MATCH_AREA = 100.0;
 
+        int counter = 0;
+        double sX = 0;
+        double sY = 0;
+        for(int i=0; i<PairNum; i++){
+            if(matches[i][1].distance - matches[i][0].distance > 3){
+                counter++;
+                Point from = keypoints1[matches[i][0].queryIdx].pt;
+                Point to = keypoints2[matches[i][0].trainIdx].pt;
+                sX += from.x - to.x;
+                sY += from.y - to.y;
+            }
+        }
+        sX = sX / counter;
+        sY = sY / counter;
+        Log.d(MATCH, String.format("sX=%f sY=%f\n", sX, sY));
+
+
+        int counter2 = 0;
+        double sX2 = 0, sY2 = 0;
         for (int i = 0; i < PairNum; i++) {
             StringBuilder b = new StringBuilder();
+            StringBuilder b1 = new StringBuilder();
+            boolean found = false;
 
             for(int j = 0; j < OptionNum; j++){
                 DMatch match = matches[i][j];
-                b.append(match.distance);
-                b.append(' ');
+                //b.append(match.distance);
+                //b.append(' ');
                 Point from = keypoints1[match.queryIdx].pt;
                 Point to = keypoints2[match.trainIdx].pt;
+
                 double dist = Math.hypot(from.x - to.x, from.y - to.y);
+                b.append(" dx=");
+                b.append(from.x-to.x);
+                b1.append(" dy=");
+                b1.append(from.y-to.y);
+
                 if(dist < MATCH_AREA){
+                    if(j+1<OptionNum){
+                        b.append(String.format(" d1=%f d2=%f\n", match.distance, matches[i][j+1].distance));
+                        if(matches[i][j+1].distance - match.distance > 3){
+                            counter2++;
+                            sX2 += from.x - to.x;
+                            sY2 += from.y - to.y;
+                        }
+                    }
                     good.add(match);
+                    found = true;
                     break; // search best pair for the next keypoint
                 }
             }
-            //Log.d(MATCH, String.format("Distances=%s", b.toString()));
+            if(found) Log.d(MATCH, String.format("%s\n%s\n", b.toString(), b1.toString()));
         }
         Log.d(MATCH, String.format("Good matches number=%d", good.size()));
+        sX2 = sX2 / counter2;
+        sY2 = sY2 / counter2;
+        Log.d(MATCH, String.format("sX2=%f sY2=%f\n", sX2, sY2));
 
         MatOfDMatch res = new MatOfDMatch();
         DMatch[] oneMoreTMP = new DMatch[good.size()];
@@ -174,33 +217,48 @@ public class ImageComparator {
         return res;
     }
 
+    public void detectWithMSER(Mat img, MatOfKeyPoint kpoints, FeatureDetector mser){
+        Mat grayscale = img.clone();
+        Imgproc.cvtColor(img, grayscale, Imgproc.COLOR_BGR2GRAY);
+        mser.detect(grayscale, kpoints);
+    }
+
+
     public Bitmap matchImages(Context ctx, int id1, int id2){
 
-        Mat s1 = loadImage(ctx, id1);
-        Mat s2 = loadImage(ctx, id2);
+        img1 = loadImage(ctx, id1);
+        img2 = loadImage(ctx, id2);
 
-        MatOfKeyPoint k1 = new MatOfKeyPoint(), k2 = new MatOfKeyPoint();
-        FeatureDetector detector = FeatureDetector.create(FeatureDetector.ORB);
-        detector.detect(s1, k1);
-        detector.detect(s2, k2);
-        Log.d(MATCH, String.format("Keypoint num=%d %d", k1.rows()*k1.cols(), k2.rows()*k2.cols()));
+//        StringBuilder s = new StringBuilder();
+//        for(double d : s1.get(0,0)){
+//            s.append(d);
+//            s.append(" ");
+//        }
+//        Log.d(MATCH, s.toString());
+
+        kPoints1 = new MatOfKeyPoint(); kPoints2 = new MatOfKeyPoint();
+        FeatureDetector detector = FeatureDetector.create(FeatureDetector.MSER);
+        detectWithMSER(img1, kPoints1, detector);
+        detectWithMSER(img2, kPoints2, detector);
+        Log.d(MATCH, String.format("Keypoint num=%d %d", kPoints1.rows()*kPoints1.cols(),
+                kPoints2.rows()*kPoints2.cols()));
 
         // image descriptors
         Mat d1 = new Mat(), d2 = new Mat();
 
         DescriptorExtractor extractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
-        extractor.compute(s1, k1, d1);
-        extractor.compute(s2, k2, d2);
+        extractor.compute(img1, kPoints1, d1);
+        extractor.compute(img2, kPoints2, d2);
 
         //MatOfDMatch matches = new MatOfDMatch();
         ArrayList<MatOfDMatch> matches = new ArrayList<>();
-        // TODO find out, method should have specified barrier size
+        // _TODO find out, method should have specified barrier size
         DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMINGLUT);
         //matcher.match(d1, d2, matches);
         matcher.knnMatch(d1, d2, matches, 10);
 
 
-        MatOfDMatch goodMatches = selectGoodMatches(matches, k1, k2);
+        MatOfDMatch goodMatches = selectGoodMatches(matches);
         //MatOfDMatch goodMatches = selectBestMatches(matches, k1, k2);
 
         //output image
@@ -209,10 +267,10 @@ public class ImageComparator {
         Scalar RED = new Scalar(255,0,0);
         Scalar GREEN = new Scalar(0,200,0);
         // empty mask = draw all found matches
-        // MatOfByte drawnMatches = new MatOfByte();
-        Features2d.drawMatches(s1, k1, s2, k2, goodMatches, mm);
+        MatOfByte drawnMatches = new MatOfByte();
+        Features2d.drawMatches(img1, kPoints1, img2, kPoints2, goodMatches, mm);
 
-        //GREEN, RED, drawnMatches, Features2d.DRAW_RICH_KEYPOINTS); // ENABLE to view keypoint areas
+        //GREEN, RED, drawnMatches, Features2d.DRAW_RICH_KEYPOINTS + Features2d.NOT_DRAW_SINGLE_POINTS); // ENABLE to view keypoint areas
 
 //        Magic OpenCV multiplication)
 //        Log.d(TEST, String.format("%d",CvType.CV_8UC1)); - 0
