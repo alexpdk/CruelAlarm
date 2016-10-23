@@ -1,4 +1,4 @@
-package com.weiaett.cruelalarm;
+package com.weiaett.cruelalarm.utils;
 
 /**
  * Created by Weiss_A on 26.09.2016.

@@ -94,15 +94,12 @@ public class AlarmListActivity extends AppCompatActivity
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 if (actionMode != null && fab.isShown()) {
                     fab.hide();
-                    Log.d("fab", "hide, action");
                 }
                 if (dy > 0 && fab.isShown()) {
                     fab.hide();
-                    Log.d("fab", "hide");
                 }
                 if (dy <= 0 && !fab.isShown() && actionMode == null) {
                     fab.show();
-                    Log.d("fab", "show");
                 }
             }
         });
@@ -146,7 +143,7 @@ public class AlarmListActivity extends AppCompatActivity
         alarmListAdapter.toggleSelection(position);
         int count = alarmListAdapter.getSelectedItemCount();
         if (count > 0) {
-            actionMode.setTitle("Выбрано: " + alarmListAdapter.getSelectedItemCount());
+            actionMode.setTitle(getString(R.string.selection_count) + alarmListAdapter.getSelectedItemCount());
         } else {
             actionMode.finish();
         }
@@ -204,9 +201,9 @@ public class AlarmListActivity extends AppCompatActivity
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(AlarmListActivity.this);
             builder.setView(dialogView)
-                    .setTitle("Настройки")
-                    .setNegativeButton("Отмена", null)
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    .setTitle(R.string.selection_settings_title)
+                    .setNegativeButton(R.string.button_negative, null)
+                    .setPositiveButton(R.string.button_positive, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
@@ -258,7 +255,6 @@ public class AlarmListActivity extends AppCompatActivity
                     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                     if (fab.isShown()) {
                         fab.hide();
-                        Log.d("fab", "hide, action init");
                     }
                     MenuInflater inflater = actionMode.getMenuInflater();
                     inflater.inflate(R.menu.action_mode_menu, menu);
@@ -277,7 +273,6 @@ public class AlarmListActivity extends AppCompatActivity
                     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                     if (!fab.isShown()) {
                         fab.show();
-                        Log.d("fab", "show, action done");
                     }
                 }
 
@@ -294,7 +289,8 @@ public class AlarmListActivity extends AppCompatActivity
                         case R.id.action_select:
                             if (selectedItemPositions.size() < alarmListAdapter.getAlarmsCount()) {
                                 alarmListAdapter.selectAll();
-                                actionMode.setTitle("Выбрано: " + alarmListAdapter.getSelectedItemCount());
+                                actionMode.setTitle(getString(R.string.selection_count) +
+                                        alarmListAdapter.getSelectedItemCount());
                             } else {
                                 alarmListAdapter.clearSelections();
                                 actionMode.finish();

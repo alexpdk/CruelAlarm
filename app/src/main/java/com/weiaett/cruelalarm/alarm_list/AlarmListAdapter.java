@@ -26,7 +26,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.weiaett.cruelalarm.R;
-import com.weiaett.cruelalarm.Weekday;
+import com.weiaett.cruelalarm.utils.Weekday;
 import com.weiaett.cruelalarm.graphics.ColorCircleDrawable;
 import com.weiaett.cruelalarm.models.Alarm;
 import com.weiaett.cruelalarm.utils.Utils;
@@ -202,7 +202,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             alarm.setTone(tone);
         }
         alarm.setHasVibration(hasVibration);
-        alarm.updateInDatabase();
+        alarm.updateAttributesInDatabase();
     }
 
     void onActivityResult(int resultCode, Intent ringtoneIntent) {
@@ -213,7 +213,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 ListViewHolder holder = (ListViewHolder) recyclerView.findViewHolderForAdapterPosition(waitingForToneAlarmPosition);
                 holder.item.setTone(ringtoneTitle);
                 holder.item.setToneUri(uri);
-                holder.item.updateInDatabase();
+                holder.item.updateAttributesInDatabase();
                 notifyItemChanged(holder.getAdapterPosition());
             }
         }
@@ -349,7 +349,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void afterTextChanged(Editable s) {
                     if (!item.getDescription().equals(s.toString())) {
                         item.setDescription(s.toString());
-                        item.updateInDatabase();
+                        item.updateAttributesInDatabase();
                     }
                 }
             });
@@ -395,7 +395,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (item.getHasVibration() != isChecked) {
                         item.setHasVibration(isChecked);
-                        item.updateInDatabase();
+                        item.updateAttributesInDatabase();
                     }
                 }
             });

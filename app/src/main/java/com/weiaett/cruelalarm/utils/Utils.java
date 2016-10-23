@@ -120,7 +120,6 @@ public class Utils {
 
     public static void callAlarmScheduleService(Context context) {
         Intent alarmServiceIntent = new Intent(context, AlarmServiceBroadcastReceiver.class);
-//        Intent alarmServiceIntent = new Intent(context, WakeUpBroadcastReceiver.class);
         context.sendBroadcast(alarmServiceIntent);
     }
 

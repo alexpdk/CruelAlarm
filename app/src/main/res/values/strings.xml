@@ -22,4 +22,7 @@
     <string name="label_copyright">CruelAlarm &#169; 2016</string>
     <string name="default_version">1</string>
     <string name="label_about">О программе</string>
+    <string name="selection_count">"Выбрано: "</string>
+    <string name="selection_settings_title">Настройки</string>
+    <string name="intent_alarm">alarm</string>
 </resources>

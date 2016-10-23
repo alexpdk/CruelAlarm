@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.util.Log;
 
-import com.weiaett.cruelalarm.Weekday;
 import com.weiaett.cruelalarm.models.Alarm;
 
 import java.util.ArrayList;

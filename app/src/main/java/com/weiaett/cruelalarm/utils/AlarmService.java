@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.weiaett.cruelalarm.R;
 import com.weiaett.cruelalarm.WakeUpBroadcastReceiver;
 import com.weiaett.cruelalarm.models.Alarm;
 
@@ -39,8 +40,7 @@ public class AlarmService extends Service {
             alarm.schedule(getApplicationContext());
         } else {
             Intent myIntent = new Intent(getApplicationContext(), WakeUpBroadcastReceiver.class);
-//            myIntent.putExtra("alarm", new Alarm(getBaseContext()));
-
+            myIntent.putExtra(this.getString(R.string.intent_alarm), new Alarm(getBaseContext()));
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, myIntent,PendingIntent.FLAG_CANCEL_CURRENT);
             AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
