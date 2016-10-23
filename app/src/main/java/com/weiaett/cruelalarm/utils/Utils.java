@@ -3,10 +3,12 @@ package com.weiaett.cruelalarm.utils;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.PowerManager;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -114,5 +116,32 @@ public class Utils {
             }
         });
         return animator;
+    }
+
+    public static void callAlarmScheduleService(Context context) {
+        Intent alarmServiceIntent = new Intent(context, AlarmServiceBroadcastReceiver.class);
+//        Intent alarmServiceIntent = new Intent(context, WakeUpBroadcastReceiver.class);
+        context.sendBroadcast(alarmServiceIntent);
+    }
+
+    private static PowerManager.WakeLock wakeLock = null;
+    public static void lockOn(Context context) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        if (wakeLock == null)
+            wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP, "CRUEL_ALARM");
+        wakeLock.acquire();
+        KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("CRUEL_ALARM");
+        keyguardLock.disableKeyguard();
+    }
+
+    public static void lockOff() {
+        try {
+            if (wakeLock != null)
+                wakeLock.release();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

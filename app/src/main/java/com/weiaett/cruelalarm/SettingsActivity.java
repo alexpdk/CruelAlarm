@@ -1,6 +1,5 @@
 package com.weiaett.cruelalarm;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,8 +25,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.weiaett.cruelalarm.utils.Utils;
-
-import org.antlr.runtime.RecognitionException;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -101,7 +98,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Utils.callTonePicker(SettingsActivity.this, Uri.parse(config.getString
                         (getBaseContext().getString(R.string.sp_config_tone_uri),
-                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())), 0);
+                                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())), 0);
             }
         });
         tvToneLabel.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Utils.callTonePicker(SettingsActivity.this, Uri.parse(config.getString
                         (getBaseContext().getString(R.string.sp_config_tone_uri),
-                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())), 0);
+                                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())), 0);
             }
         });
         swHasVibration.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -139,10 +136,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    void callIntervalTimePicker() {
+    private void callIntervalTimePicker() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final NumberPicker numberPicker = new NumberPicker(this);
         setDividerColor(numberPicker, R.color.colorAccent);
+        numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         numberPicker.setMinValue(5);
         numberPicker.setMaxValue(15);
         numberPicker.setValue(5);
@@ -151,7 +149,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 SharedPreferences.Editor editor = config.edit();
-                editor.putString(getBaseContext().getString(R.string.sp_config_interval), Integer.toString(numberPicker.getValue()));
+                editor.putInt(getBaseContext().getString(R.string.sp_config_interval), numberPicker.getValue());
                 editor.apply();
                 tvInterval.setText(String.format(getBaseContext().getString(R.string.formatted_interval),
                         Integer.toString(numberPicker.getValue())));
@@ -172,7 +170,7 @@ public class SettingsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    void callAboutDialog() {
+    private void callAboutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setPositiveButton(com.weiaett.cruelalarm.R.string.button_positive, new DialogInterface.OnClickListener() {
             @Override
@@ -184,16 +182,16 @@ public class SettingsActivity extends AppCompatActivity {
         final ImageView logo = new ImageView(this);
         final TextView title = new TextView(this);
         final TextView version = new TextView(this);
-        logo.setImageDrawable(this.getResources().getDrawable(R.mipmap.ic_launcher));
+        logo.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         title.setText(R.string.label_copyright);
         title.setTextSize(18);
-        String versionName = "1";
+        String versionName = getString(com.weiaett.cruelalarm.R.string.default_version);
         try {
-             versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        version.setText(String.format(this.getString(R.string.label_version), versionName));
+        version.setText(String.format(getString(R.string.label_version), versionName));
         version.setTextSize(14);
         parent.addView(logo);
 
@@ -203,7 +201,7 @@ public class SettingsActivity extends AppCompatActivity {
         params.gravity = Gravity.CENTER;
         parent.addView(title, params);
         parent.addView(version, params);
-        builder.setTitle("О программе");
+        builder.setTitle(com.weiaett.cruelalarm.R.string.label_about);
         builder.setView(parent);
         AlertDialog dialog = builder.create();
         dialog.show();

@@ -20,4 +20,6 @@
     <string name="formatted_interval">%1$s минут</string>
     <string name="label_version">Версия %1$s</string>
     <string name="label_copyright">CruelAlarm &#169; 2016</string>
+    <string name="default_version">1</string>
+    <string name="label_about">О программе</string>
 </resources>

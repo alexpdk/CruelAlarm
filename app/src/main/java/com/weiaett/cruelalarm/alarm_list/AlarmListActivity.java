@@ -14,6 +14,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -93,11 +94,16 @@ public class AlarmListActivity extends AppCompatActivity
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 if (actionMode != null && fab.isShown()) {
                     fab.hide();
+                    Log.d("fab", "hide, action");
                 }
-                if (dy > 0 && fab.isShown())
+                if (dy > 0 && fab.isShown()) {
                     fab.hide();
-                if (dy <= 0 && !fab.isShown())
+                    Log.d("fab", "hide");
+                }
+                if (dy <= 0 && !fab.isShown() && actionMode == null) {
                     fab.show();
+                    Log.d("fab", "show");
+                }
             }
         });
     }
@@ -250,8 +256,10 @@ public class AlarmListActivity extends AppCompatActivity
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
                     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-                    if (fab.isShown())
+                    if (fab.isShown()) {
                         fab.hide();
+                        Log.d("fab", "hide, action init");
+                    }
                     MenuInflater inflater = actionMode.getMenuInflater();
                     inflater.inflate(R.menu.action_mode_menu, menu);
                     return true;
@@ -267,8 +275,10 @@ public class AlarmListActivity extends AppCompatActivity
                     AlarmListActivity.this.actionMode = null;
                     alarmListAdapter.clearSelections();
                     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-                    if (!fab.isShown())
+                    if (!fab.isShown()) {
                         fab.show();
+                        Log.d("fab", "show, action done");
+                    }
                 }
 
                 @Override

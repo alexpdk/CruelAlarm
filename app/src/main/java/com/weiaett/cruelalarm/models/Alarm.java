@@ -1,15 +1,25 @@
 package com.weiaett.cruelalarm.models;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
 import com.weiaett.cruelalarm.R;
-import com.weiaett.cruelalarm.utils.DBHelper;
+import com.weiaett.cruelalarm.WakeUpBroadcastReceiver;
 import com.weiaett.cruelalarm.Weekday;
+import com.weiaett.cruelalarm.utils.DBHelper;
+import com.weiaett.cruelalarm.utils.Utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.EnumSet;
+import java.util.Locale;
 
 /**
  * Created by Weiss_A on 26.09.2016.
@@ -57,6 +67,55 @@ public class Alarm {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public Calendar getAlarmTime() {
+        Calendar calendar = Calendar.getInstance();
+        int currDay = calendar.get(Calendar.DAY_OF_WEEK);
+        if (currDay != 1) {
+            currDay--;
+        } else {
+            currDay = 7;
+        }
+        currDay--;
+
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time.substring(0, 2)));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(time.substring(3)));
+        calendar.set(Calendar.SECOND, 0);
+
+        if (this.getDays().isEmpty() || this.getDays().size() == 7) {
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+            }
+        } else {
+            int chosenDay = -1;
+            for (Weekday day: getDays()) {
+                if (day.ordinal() > currDay || day.ordinal() == currDay && calendar.after(Calendar.getInstance())) {
+                    chosenDay = day.ordinal();
+                    break;
+                }
+            }
+            if (chosenDay == -1) {
+                chosenDay = getDays().iterator().next().ordinal();
+            }
+            chosenDay++;
+            if (chosenDay != 7) {
+                chosenDay++;
+            } else {
+                chosenDay = 1;
+            }
+            calendar.set(Calendar.DAY_OF_WEEK, chosenDay);
+        }
+        return calendar;
+    }
+
+    public void schedule(Context context) {
+
+        Intent myIntent = new Intent(context, WakeUpBroadcastReceiver.class);
+        //    myIntent.putExtra("alarm", this);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent,PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, getAlarmTime().getTimeInMillis(), pendingIntent);
     }
 
     public boolean getIsActive() {
@@ -113,13 +172,16 @@ public class Alarm {
 
     public void deleteFromDatabase() {
         DBHelper.getInstance(context).deleteAlarm(this);
+        Utils.callAlarmScheduleService(context);
     }
 
     public void addToDatabase() {
         DBHelper.getInstance(context).addAlarm(this);
+        Utils.callAlarmScheduleService(context);
     }
 
     public void updateInDatabase() {
         DBHelper.getInstance(context).updateAlarm(this);
+        Utils.callAlarmScheduleService(context);
     }
 }
