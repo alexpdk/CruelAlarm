@@ -116,6 +116,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 bindPalette(listViewHolder);
                 if (expandedAlarmPosition == position && listViewHolder.expandableViewPart.getVisibility() == View.GONE) {
                     Utils.expand(listViewHolder.expandableViewPart);
+                    listViewHolder.expandAlarmView.setVisibility(View.INVISIBLE);
                 } else if (expandedAlarmPosition != position && listViewHolder.expandableViewPart.getVisibility() == View.VISIBLE) {
                     listViewHolder.expandableViewPart.setVisibility(View.GONE);
                 }
@@ -260,8 +261,6 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private void toggleExpanding(ListViewHolder holder) {
         if (holder.expandableViewPart.getVisibility() == View.GONE) {
-            Utils.collapse(holder.expandableViewPart);
-            holder.expandAlarmView.setVisibility(View.INVISIBLE);
             notifyItemChanged(expandedAlarmPosition);
             expandedAlarmPosition = holder.getAdapterPosition();
             notifyItemChanged(expandedAlarmPosition);
