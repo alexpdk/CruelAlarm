@@ -17,7 +17,7 @@
     <string name="button_negative">Отмена</string>
     <string name="label_default">По-умолчанию</string>
     <string name="default_interval">5</string>
-    <string name="formatted_interval">%1$s минут</string>
+    <string name="formatted_interval">%1$d минут</string>
     <string name="label_version">Версия %1$s</string>
     <string name="label_copyright">CruelAlarm &#169; 2016</string>
     <string name="default_version">1</string>

@@ -62,8 +62,8 @@ public class SettingsActivity extends AppCompatActivity {
                 getString(com.weiaett.cruelalarm.R.string.label_default)));
         swHasVibration.setChecked(config.getBoolean(this.getString(R.string.sp_config_vibration), false));
         tvInterval.setText(String.format(this.getString(R.string.formatted_interval),
-                (config.getString(this.getString(R.string.sp_config_interval),
-                        getString(com.weiaett.cruelalarm.R.string.default_interval)))));
+                (config.getInt(this.getString(R.string.sp_config_interval),
+                        Integer.parseInt(getString(com.weiaett.cruelalarm.R.string.default_interval))))));
 
         setupViews();
     }
@@ -152,7 +152,7 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.putInt(getBaseContext().getString(R.string.sp_config_interval), numberPicker.getValue());
                 editor.apply();
                 tvInterval.setText(String.format(getBaseContext().getString(R.string.formatted_interval),
-                        Integer.toString(numberPicker.getValue())));
+                        numberPicker.getValue()));
             }
         });
         builder.setNegativeButton(com.weiaett.cruelalarm.R.string.button_negative, new DialogInterface.OnClickListener() {
