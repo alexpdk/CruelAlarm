@@ -33,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView statusView;
 
     // compared image
-    private static int sample = R.drawable.m2;
+    private static int sample = R.drawable.back_small2;
     // images to compare sample with
     private static int[] images = new int[]{
-        R.drawable.m1, R.drawable.m2, R.drawable.back_small, R.drawable.b_oven,
+        R.drawable.m1, R.drawable.m2, R.drawable.back_small, R.drawable.back_small2, R.drawable.b_oven,
         R.drawable.oven_small, R.drawable.tv_small, R.drawable.flower_small,
         R.drawable.other_small, R.drawable.oven_small2};
 

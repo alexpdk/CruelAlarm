@@ -58,6 +58,8 @@ class Comparator(ctx: Context, id1: Int, id2: Int, val setState:(s:String)->Unit
     var shiftX = 0.0
     var shiftY = 0.0
 
+    val black = Scalar(0.0,0.0,0.0)
+
     lateinit var result: String
 
     private fun clamp(v: Int, min: Int, max: Int) = if(v < min) min else if(v > max) max else v
@@ -69,24 +71,73 @@ class Comparator(ctx: Context, id1: Int, id2: Int, val setState:(s:String)->Unit
         return Math.sqrt(dR*dR+dG*dG+dB*dB)
     }
 
-    fun comparePixels(shiftX: Int, shiftY: Int): Long{
-        var matched = 0L
-        for(i in 0 until img1.width()){
-            for(j in 0 until img1.height()){
-                if(colorDist(img1.get(i,j), img2.get(i+shiftX,j+shiftY)) < 90){
-                    matched++
-                }
-            }
+    fun comparePixels(shiftX: Int, shiftY: Int): Int{
+//        Log.d(MATCH, "CC")
+//        var matched = 0
+//        for(i in 0 until img1.width()){
+//            for(j in 0 until img1.height()){
+//                if(colorDist(img1.get(i,j), img2.get(i+shiftX,j+shiftY)) < 90){
+//                    matched++
+//                }
+//            }
+//        }
+//        Log.d(MATCH, "Matched1 = $matched")
+
+        val mat1 = img1
+        val mat2 = cropMat(img2, shiftX, shiftY)
+        val dist = Mat()
+        Core.subtract(mat1, mat2, dist)
+
+        val mult = Mat()
+        Core.multiply(dist, dist, mult)
+        mult.convertTo(mult, CvType.CV_32FC3, 1/255.0)
+
+        val root = Mat()
+        Core.sqrt(mult, root)
+
+        val bw = Mat()
+        val BINARY = 0
+        Imgproc.threshold(root, bw, 120/255.0, 1.0, BINARY)
+
+        val c1 = Mat()
+        Imgproc.cvtColor(bw, c1, Imgproc.COLOR_BGR2GRAY)
+
+        val matched2 = c1.total().toInt()-Core.countNonZero(c1)
+        Log.d(MATCH, "Matched2 = $matched2")
+
+        return matched2
+    }
+
+    fun cropMat(img: Mat, shiftX: Int, shiftY: Int): Mat{
+        Log.d(MATCH, "shiftX=$shiftX shiftY=$shiftY")
+        var mat = img
+        val rows = mat.rows().toInt()
+        val cols = mat.cols().toInt()
+        val type = mat.type()
+
+        val dstX = Mat(rows, cols+Math.abs(shiftX), type)
+        if(shiftX > 0) {
+            Core.hconcat(listOf(Mat(rows, shiftX, type).setTo(black), mat), dstX)
+            mat = Mat(dstX, Rect(0, 0, cols, rows))
+        }else if(shiftX < 0){
+            val nm = Mat(rows, -shiftX, type).setTo(black)
+            Log.d(MATCH, "dims=${nm.dims()} rows=${nm.rows()} empty=${nm.empty()}")
+            Core.hconcat(listOf(mat,nm), dstX)
+            val r = Rect(-shiftX, 0, cols, rows)
+            Log.d(MATCH, r.toString())
+            mat = Mat(dstX, r)
         }
-        return matched
-//        val mat1 = MatOfPoint3f(img1)
-//        val mat2 = MatOfPoint3f(img2)
-//        val dist = MatOfPoint3f()
-//        Core.subtract(mat1, mat2, dist)
-//        val mult = MatOfPoint3f()
-//        Core.multiply(dist, dist.clone(), mult)
-//        val res = MatOfPoint3f()
-//        Core.sqrt(mult, res)
+
+        val dstY = Mat(rows+Math.abs(shiftY), cols, type)
+        if(shiftY > 0) {
+            Core.vconcat(listOf(Mat(shiftY, cols, type).setTo(black), mat), dstY)
+            mat = Mat(dstY, Rect(0, 0, cols, rows))
+        }else if(shiftY < 0){
+            Core.vconcat(listOf(mat, Mat(-shiftY, cols, type).setTo(black)), dstY)
+            mat = Mat(dstY, Rect(0, -shiftY, cols, rows))
+        }
+
+        return mat
     }
 
     private fun detectWithMSER(img: Mat, kPoints: MatOfKeyPoint, mser: FeatureDetector) {
@@ -97,13 +148,15 @@ class Comparator(ctx: Context, id1: Int, id2: Int, val setState:(s:String)->Unit
 
     private fun drawMatches(matches: ArrayList<DMatch>): Bitmap{
         val dst = Mat(img1.rows().toInt(), img1.cols().toInt()*2, img1.type())
-        Core.hconcat(listOf(img1, img2), dst)
+        val cropped = cropMat(img2, shiftX.toInt(), shiftY.toInt())
+        Core.hconcat(listOf(img1, cropped), dst)
 
         var colorCount = 0;
         for(match in matches){
             val from = keypoints1[match.queryIdx].pt
             val to = keypoints2[match.trainIdx].pt.clone()
-            to.x += img1.width()
+            to.x += img1.width()+shiftX
+            to.y += shiftY
             Core.line(dst, from, to, Colors[colorCount], 2)
             colorCount = (colorCount+1)% Colors.size
         }
@@ -194,8 +247,8 @@ class Comparator(ctx: Context, id1: Int, id2: Int, val setState:(s:String)->Unit
 
         if(goodMatches.size < 10){
             result = "Not enough good matches: ${goodMatches.size}"
-        }else if(pxNum < 800000){
-            result = "Not enough matched pixels: $pxNum / 800000"
+        }else if(pxNum < 700000){
+            result = "Not enough matched pixels: $pxNum / 700000"
         }else{
             result = "Images matched!"
         }
@@ -234,7 +287,7 @@ class Comparator(ctx: Context, id1: Int, id2: Int, val setState:(s:String)->Unit
             })
             shiftX += sumX / counter
             shiftY += sumY / counter
-            Log.d(MATCH, "shiftX=$shiftX shiftY=$shiftY pairNum=$counter")
+            //Log.d(MATCH, "shiftX=$shiftX shiftY=$shiftY pairNum=$counter")
         }
 
         val good = ArrayList<DMatch>()
