@@ -9,49 +9,51 @@
     <TextView
         style="@style/Weekday"
         android:text="П"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
+        android:layout_marginStart="6dp"
         android:id="@+id/tvMonday"/>
 
     <TextView
         style="@style/Weekday"
         android:text="В"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
         android:id="@+id/tvTuesday"/>
 
     <TextView
         style="@style/Weekday"
         android:text="С"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
         android:id="@+id/tvWednesday"/>
 
     <TextView
         style="@style/Weekday"
         android:text="Ч"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
         android:id="@+id/tvThursday"/>
 
     <TextView
         style="@style/Weekday"
         android:text="П"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
         android:id="@+id/tvFriday"/>
 
     <TextView
         style="@style/Weekday"
         android:text="С"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
         android:id="@+id/tvSaturday"/>
 
     <TextView
         style="@style/Weekday"
         android:text="В"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
         android:textSize="20sp"
+        android:layout_marginEnd="6dp"
         android:id="@+id/tvSunday"/>
 </LinearLayout>
