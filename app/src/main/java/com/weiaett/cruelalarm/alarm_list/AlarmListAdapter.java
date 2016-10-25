@@ -132,12 +132,10 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 for (Weekday day : Weekday.values()) {
                     int colorId = holder.item.getDays().contains(day) ?
                             R.color.colorAccent : R.color.colorNotActive;
-                    SpannableString simpleSpannable = new SpannableString(day.toString());
+                    SpannableString simpleSpannable = new SpannableString(String.format("%-6s", day.toString()));
                     simpleSpannable.setSpan(new ForegroundColorSpan(context.getResources().
                             getColor(colorId)), 0, day.toString().length(), 0);
                     builder.append(simpleSpannable);
-                    SpannableString space = new SpannableString(" ");
-                    builder.append(space);
                 }
                 holder.activeDayView.setText(builder, TextView.BufferType.SPANNABLE);
             }

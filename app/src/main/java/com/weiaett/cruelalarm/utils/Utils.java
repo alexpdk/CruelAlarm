@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.PowerManager;
@@ -57,7 +58,7 @@ public class Utils {
 
     public static void expand(final View view) {
         view.setVisibility(View.VISIBLE);
-        int finalHeight = 310; // TODO: get real height
+        int finalHeight = dpToPx(120); // TODO: get real height
         ValueAnimator animator = slideAnimator(view, 0, finalHeight);
         animator.addListener(new Animator.AnimatorListener() {
             @Override
@@ -142,5 +143,13 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static int pxToDp(int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    public static int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 }
