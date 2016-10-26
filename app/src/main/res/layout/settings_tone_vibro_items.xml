@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorWhite">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Общая мелодия"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_music_note_black_24dp"
+            android:drawableTint="@color/colorGreyText"
+            android:textColor="@color/colorPrimary"
+            android:drawablePadding="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical|start"
+            android:id="@+id/tvToneLabel"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:textSize="16sp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical|end"
+            android:id="@+id/tvTone"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <Switch
+        android:text="Вибрация"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_vibration_black_24dp"
+        android:drawableTint="@color/colorGreyText"
+        android:textColor="@color/colorPrimary"
+        android:drawablePadding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_vertical"
+        android:id="@+id/switchVibration" />
+
+</LinearLayout>

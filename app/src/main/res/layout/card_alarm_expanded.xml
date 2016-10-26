@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorGreyText"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp">
+    </View>
+
+    <include layout="@layout/palette_days"
+        android:id="@+id/incDayPalette"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:weightSum="5">
+
+        <TextView
+            android:text="Bethoven — Symphony 7"
+            android:drawableStart="@drawable/ic_music_note_black_24dp"
+            android:drawableTint="@color/colorGreyText"
+            android:drawablePadding="8dp"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvTone"/>
+
+        <Switch
+            android:text="Вибрация"
+            android:textColor="@color/colorGreyText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/switchVibration"
+            android:layout_weight="2" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:weightSum="5">
+
+        <TextView
+            android:text="Выбор фото"
+            android:drawableStart="@drawable/ic_photo_library_black_24dp"
+            android:drawableTint="@color/colorGreyText"
+            android:drawablePadding="8dp"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvPhotoPicker"/>
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Описание..."
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+            android:id="@+id/etDescription"
+            android:singleLine="true"
+            android:layout_weight="3" />
+    </LinearLayout>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_keyboard_arrow_up_black_18dp"
+        android:tint="@color/colorGreyText"
+        android:layout_marginEnd="8dp"
+        android:background="@null"
+        android:layout_gravity="end"
+        android:id="@+id/btnClear" />
+</LinearLayout>
+

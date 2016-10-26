@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">CruelAlarm</string>
+    <string name="title_activity_alarm_list">AlarmListActivity</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="time_format">HH:mm</string>
+    <string name="tone_picker_title">Выбор мелодии</string>
+    <string name="label_every_day">Каждый день</string>
+    <string name="label_today">Сегодня</string>
+    <string name="label_tomorrow">Завтра</string>
+    <string name="time_default">00:00</string>
+    <string name="sp_config">config</string>
+    <string name="sp_config_tone_uri">tone_uri</string>
+    <string name="sp_config_tone">tone</string>
+    <string name="sp_config_interval">interval</string>
+    <string name="sp_config_vibration">vibration</string>
+    <string name="button_positive">OK</string>
+    <string name="button_negative">Отмена</string>
+    <string name="label_default">По-умолчанию</string>
+    <string name="default_interval">5</string>
+    <string name="formatted_interval">%1$d минут</string>
+    <string name="label_version">Версия %1$s</string>
+    <string name="label_copyright">CruelAlarm &#169; 2016</string>
+    <string name="default_version">1</string>
+    <string name="label_about">О программе</string>
+    <string name="selection_count">"Выбрано: "</string>
+    <string name="selection_settings_title">Настройки</string>
+    <string name="intent_alarm">alarm</string>
+</resources>
