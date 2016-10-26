@@ -25,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:weightSum="3">
+        android:weightSum="5">
 
         <TextView
             android:text="Bethoven — Symphony 7"
@@ -33,7 +33,7 @@
             android:drawableTint="@color/colorGreyText"
             android:drawablePadding="8dp"
             android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
             android:id="@+id/tvTone"/>
 
@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/switchVibration"
-            android:layout_weight="1" />
+            android:layout_weight="2" />
     </LinearLayout>
 
     <LinearLayout
@@ -53,7 +53,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:weightSum="3">
+        android:weightSum="5">
 
         <TextView
             android:text="Выбор фото"
@@ -61,7 +61,7 @@
             android:drawableTint="@color/colorGreyText"
             android:drawablePadding="8dp"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:layout_height="wrap_content"
             android:id="@+id/tvPhotoPicker"/>
 
@@ -72,14 +72,14 @@
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
             android:id="@+id/etDescription"
             android:singleLine="true"
-            android:layout_weight="2" />
+            android:layout_weight="3" />
     </LinearLayout>
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_keyboard_arrow_up_black_24dp"
-
+        app:srcCompat="@drawable/ic_keyboard_arrow_up_black_18dp"
+        android:tint="@color/colorGreyText"
         android:layout_marginEnd="8dp"
         android:background="@null"
         android:layout_gravity="end"

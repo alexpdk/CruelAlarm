@@ -33,7 +33,7 @@
 
         <TextView
             android:text="Интервал повторения"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:drawableStart="@drawable/ic_hourglass_empty_black_24dp"
             android:drawableTint="@color/colorGreyText"
             android:textColor="@color/colorPrimary"
@@ -47,7 +47,7 @@
 
         <TextView
             android:text="5 минут"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_marginEnd="16dp"
@@ -58,7 +58,7 @@
 
     <TextView
         android:text="Менеджер фотографий"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:drawableStart="@drawable/ic_photo_library_black_24dp"
         android:drawableTint="@color/colorGreyText"
         android:textColor="@color/colorPrimary"
@@ -80,7 +80,7 @@
 
     <TextView
         android:text="Обучение"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:drawableStart="@drawable/ic_book_black_24dp"
         android:drawableTint="@color/colorGreyText"
         android:textColor="@color/colorPrimary"
@@ -93,7 +93,7 @@
 
     <TextView
         android:text="О приложении"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:drawableStart="@drawable/ic_info_black_24dp"
         android:drawableTint="@color/colorGreyText"
         android:textColor="@color/colorPrimary"

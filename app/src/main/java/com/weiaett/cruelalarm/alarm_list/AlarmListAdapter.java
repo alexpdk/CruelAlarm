@@ -107,7 +107,7 @@ class AlarmListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         context.getResources().getColor(R.color.colorNotActive));
                 listViewHolder.clearAlarmView.setClickable(!isSelectionMode());
                 listViewHolder.clearAlarmView.setVisibility(isSelectionMode() ? View.INVISIBLE : View.VISIBLE);
-                listViewHolder.expandAlarmView.setVisibility(isSelectionMode() ? View.GONE : View.VISIBLE);
+                listViewHolder.expandAlarmView.setVisibility(isSelectionMode() ? View.INVISIBLE : View.VISIBLE);
                 listViewHolder.timeView.setText(listViewHolder.item.getTime());
                 listViewHolder.toneView.setText(listViewHolder.item.getTone());
                 listViewHolder.descriptionView.setText(listViewHolder.item.getDescription());

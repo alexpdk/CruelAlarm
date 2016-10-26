@@ -9,7 +9,7 @@
 
     <TextView
         android:text="Фото"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:drawableStart="@drawable/ic_photo_library_black_24dp"
         android:drawableTint="@color/colorGreyText"
         android:textColor="@color/colorPrimary"
