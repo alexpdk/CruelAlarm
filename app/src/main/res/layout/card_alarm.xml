@@ -13,6 +13,9 @@
         app:srcCompat="@drawable/ic_clear_black_18dp"
         android:background="@null"
         android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:tint="@color/colorGreyText"
         android:id="@+id/btnClear" />
 
     <LinearLayout
@@ -27,20 +30,26 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             app:srcCompat="@drawable/ic_alarm_black_48dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:tint="@color/colorGreyText"
             android:id="@+id/imgAlarm" />
 
         <TextView
             android:text="22:00"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="48sp"
+            android:textSize="56sp"
+            android:fontFamily="sans-serif-thin"
             android:id="@+id/tvTime"/>
     </LinearLayout>
 
     <TextView
-        android:text="Пн Вт Ср Чт Пт Сб Вс"
+        android:text="Пн  Вт  Ср  Чт  Пт  Сб  Вс"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="sans-serif-light"
         android:id="@+id/tvDays" />
 
     <ImageView
@@ -49,6 +58,9 @@
         app:srcCompat="@drawable/ic_keyboard_arrow_down_black_18dp"
         android:background="@null"
         android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:tint="@color/colorGreyText"
         android:id="@+id/imgChevron" />
 
     <include layout="@layout/card_alarm_expanded"

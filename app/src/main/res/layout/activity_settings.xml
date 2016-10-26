@@ -33,17 +33,24 @@
 
         <TextView
             android:text="Интервал повторения"
+            android:textSize="20sp"
             android:drawableStart="@drawable/ic_hourglass_empty_black_24dp"
+            android:drawableTint="@color/colorGreyText"
+            android:textColor="@color/colorPrimary"
+            android:drawablePadding="16dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
             android:id="@+id/tvIntervalLabel"
             android:gravity="center_vertical|start"
             android:layout_weight="1" />
 
         <TextView
             android:text="5 минут"
+            android:textSize="20sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
             android:id="@+id/tvInterval"
             android:gravity="end"
             android:layout_weight="1" />
@@ -51,9 +58,14 @@
 
     <TextView
         android:text="Менеджер фотографий"
+        android:textSize="20sp"
         android:drawableStart="@drawable/ic_photo_library_black_24dp"
+        android:drawableTint="@color/colorGreyText"
+        android:textColor="@color/colorPrimary"
+        android:drawablePadding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
         android:gravity="center_vertical"
         android:id="@+id/tvPhotoManager"/>
 
@@ -61,24 +73,34 @@
         android:id="@+id/line"
         android:layout_width="match_parent"
         android:layout_height="2dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/colorNotActive">
     </View>
 
-
     <TextView
         android:text="Обучение"
+        android:textSize="20sp"
         android:drawableStart="@drawable/ic_book_black_24dp"
+        android:drawableTint="@color/colorGreyText"
+        android:textColor="@color/colorPrimary"
+        android:drawablePadding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
         android:gravity="center_vertical"
         android:id="@+id/tvLearning"/>
 
-
     <TextView
         android:text="О приложении"
+        android:textSize="20sp"
         android:drawableStart="@drawable/ic_info_black_24dp"
+        android:drawableTint="@color/colorGreyText"
+        android:textColor="@color/colorPrimary"
+        android:drawablePadding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
         android:gravity="center_vertical"
         android:id="@+id/tvAbout"/>
     </LinearLayout>
