@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +25,7 @@ import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.weiaett.cruelalarm.photo_manager.PhotoManagerActivity;
 import com.weiaett.cruelalarm.utils.Utils;
 
 
@@ -35,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView tvIntervalLabel;
     private TextView tvInterval;
     private TextView tvAbout;
+    private TextView tvPhoto;
     private SharedPreferences config;
 
 
@@ -56,6 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
         tvIntervalLabel = (TextView) findViewById(R.id.tvIntervalLabel);
         tvInterval = (TextView) findViewById(R.id.tvInterval);
         tvAbout = (TextView) findViewById(R.id.tvAbout);
+        tvPhoto = (TextView) findViewById(R.id.tvPhotoManager);
         config = this.getSharedPreferences(this.getString(R.string.sp_config), Context.MODE_PRIVATE);
 
         tvTone.setText(config.getString(this.getString(R.string.sp_config_tone),
@@ -114,6 +118,14 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = config.edit();
                 editor.putBoolean(getBaseContext().getString(R.string.sp_config_vibration), isChecked);
                 editor.apply();
+            }
+        });
+        tvPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("AAAA", "Photo manager should work");
+                Intent intent = new Intent(SettingsActivity.this, PhotoManagerActivity.class);
+                startActivity(intent);
             }
         });
         tvInterval.setOnClickListener(new View.OnClickListener() {

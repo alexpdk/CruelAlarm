@@ -13,6 +13,9 @@
 *.apk
 *.ap_
 
+### OpenCV
+openCVLibrary2411
+
 # Files for the Dalvik VM
 *.dex
 

@@ -7,6 +7,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.weiaett.cruelalarm.photo_manager.PhotoManagerFragment;
 import com.weiaett.cruelalarm.R;
 import com.weiaett.cruelalarm.SettingsActivity;
 import com.weiaett.cruelalarm.graphics.SmoothLLManager;
@@ -32,12 +35,17 @@ import com.weiaett.cruelalarm.models.Alarm;
 import com.weiaett.cruelalarm.utils.DBHelper;
 import com.weiaett.cruelalarm.utils.Utils;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import java.util.Calendar;
 import java.util.List;
 
 
 public class AlarmListActivity extends AppCompatActivity
-        implements RecyclerView.OnItemTouchListener {
+        implements RecyclerView.OnItemTouchListener,
+        PhotoManagerFragment.OnFragmentInteractionListener{
 
     static final int TONE_PICKER_ROOT_ADAPTER = 0;
     static final int TONE_PICKER_ROOT_SETTINGS = 1;
@@ -48,10 +56,28 @@ public class AlarmListActivity extends AppCompatActivity
     private ActionMode actionMode;
     private RecyclerView recyclerView;
 
+    private List<String> photos;
+
+
+    private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                    Log.i("OpenCV", "OpenCV loaded successfully");
+                    break;
+                default:
+                    super.onManagerConnected(status);
+                    Log.i("OpenCV", "Something went wrong with OpenCV load");
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_list);
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_11, this, loaderCallback);
 
         recyclerView = (RecyclerView) this.findViewById(R.id.list);
         recyclerView.setLayoutManager(new SmoothLLManager(this, LinearLayoutManager.VERTICAL, false));
@@ -72,17 +98,23 @@ public class AlarmListActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("DoubleAlarm", "fab press");
                 final Calendar calendar = Calendar.getInstance();
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                 int minute = calendar.get(Calendar.MINUTE);
                 TimePickerDialog timePickerDialog = new TimePickerDialog(AlarmListActivity.this,
                         new TimePickerDialog.OnTimeSetListener() {
+                            boolean recoil = false;
                             @Override
                             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                                calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
-                                calendar.set(Calendar.MINUTE, selectedMinute);
-                                alarmListAdapter.addAlarm(new Alarm(AlarmListActivity.this,
-                                        Utils.getFormattedTime(AlarmListActivity.this, calendar)));
+                                if (!recoil) {
+                                    Log.d("DoubleAlarm", "on time set");
+                                    recoil = true;
+                                    calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                                    calendar.set(Calendar.MINUTE, selectedMinute);
+                                    alarmListAdapter.addAlarm(new Alarm(AlarmListActivity.this,
+                                            Utils.getFormattedTime(AlarmListActivity.this, calendar)));
+                                }
                             }
                         }, hour, minute, true);
                 timePickerDialog.show();
@@ -125,7 +157,7 @@ public class AlarmListActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent ringtoneIntent) {
-       switch (requestCode) {
+        switch (requestCode) {
             case TONE_PICKER_ROOT_ADAPTER:
                 alarmListAdapter.onActivityResult(resultCode, ringtoneIntent);
                 break;
@@ -163,6 +195,15 @@ public class AlarmListActivity extends AppCompatActivity
     public void onRequestDisallowInterceptTouchEvent(boolean b) {
     }
 
+    @Override
+    public void onFragmentInteraction(List<String> photos, int alarmId) {
+        if (alarmId > 0) {
+            DBHelper.getInstance(this).setAlarmPhotos(alarmId, photos);
+        } else {
+            this.photos = photos;
+        }
+    }
+
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         private Uri commonRingtoneUri = null;
@@ -180,7 +221,9 @@ public class AlarmListActivity extends AppCompatActivity
             photoView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: call photo picker dialog
+                    DialogFragment dialogFragment = new PhotoManagerFragment();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    dialogFragment.show(fragmentManager,"Photo Manager");
                 }
             });
 
@@ -207,8 +250,13 @@ public class AlarmListActivity extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-                                alarmListAdapter.setAlarmParams(selectedItemPositions.get(i),
-                                        commonRingtoneUri, commonRingtoneTitle, vibrationView.isChecked());
+                                if (photos != null) {
+                                    alarmListAdapter.setAlarmParams(selectedItemPositions.get(i),
+                                            commonRingtoneUri, commonRingtoneTitle, vibrationView.isChecked(), photos);
+                                } else {
+                                    alarmListAdapter.setAlarmParams(selectedItemPositions.get(i),
+                                            commonRingtoneUri, commonRingtoneTitle, vibrationView.isChecked());
+                                }
                             }
                             actionMode.finish();
                         }
