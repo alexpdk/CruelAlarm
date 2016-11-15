@@ -1,5 +1,6 @@
 package com.weiaett.cruelalarm.Math;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -49,10 +50,10 @@ public class MathActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     viewHolder
                             .mathAnswer
                             .setText("Crrect");
+                    //  Передача управления куда-то
                 } else {
-                    viewHolder
-                            .mathAnswer
-                            .setText("Wrong");
+                    shuffleArray(answers);
+                    notifyDataSetChanged();
                 }
             }
         });
