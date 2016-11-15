@@ -49,7 +49,7 @@ public class MathActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         .equals(correctAnswer)) {
                     viewHolder
                             .mathAnswer
-                            .setText("Crrect");
+                            .setText("Correct");
                     //  Передача управления куда-то
                 } else {
                     shuffleArray(answers);

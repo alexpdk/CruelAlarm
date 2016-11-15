@@ -1,19 +1,15 @@
 package com.weiaett.cruelalarm.Math;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 
 import com.weiaett.cruelalarm.R;
 
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.widget.GridLayout;
-import android.widget.TextView;
-
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 public class MathActivity extends AppCompatActivity {
 
@@ -60,7 +56,7 @@ public class MathActivity extends AppCompatActivity {
 
         char secondOperand = operands[rand.nextInt(2)];
         int secondNumber,
-            thirdNumber = rand.nextInt(10) + 20;
+                thirdNumber = rand.nextInt(10) + 20;
         if (secondOperand == '/') {
             int tmp = rand.nextInt(5) + 5;
             if (firstOperand == '+')
@@ -78,7 +74,7 @@ public class MathActivity extends AppCompatActivity {
         }
 
         output[0] += Integer.toString(secondNumber)
-                  + ' ' + secondOperand + ' ' + thirdNumber;
+                + ' ' + secondOperand + ' ' + thirdNumber;
         output[1] = Integer.toString(answer);
 
         HashSet<Integer> answers = new HashSet<>();

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,9 @@ public class PhotoManagerFragment extends DialogFragment {
 
     private OnFragmentInteractionListener mListener;
     private int alarmId = -1;
-    List<String> photos;
+    private List<String> photos;
+    private PhotoManagerAdapter photoManagerAdapter;
+    private AutofitRecyclerView recyclerView;
 
     public PhotoManagerFragment() {}
 
@@ -48,17 +51,31 @@ public class PhotoManagerFragment extends DialogFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_photo_manager, container, false);
 
-        AutofitRecyclerView recyclerView = (AutofitRecyclerView) view.findViewById(R.id.recyclerViewPhotoGrid);
+        recyclerView = (AutofitRecyclerView) view.findViewById(R.id.recyclerViewPhotoGrid);
 
         Context context = view.getContext();
         List<File> files = ImageLoader.getImages(context);
         if (alarmId > 0) {
-            recyclerView.setAdapter(new PhotoManagerAdapter(files, getContext(), mListener));
+            photoManagerAdapter = new PhotoManagerAdapter(files, getContext(), mListener, alarmId);
+            recyclerView.setAdapter(photoManagerAdapter);
         } else {
-            recyclerView.setAdapter(new PhotoManagerAdapter(files, getContext(), mListener, alarmId));
+            photoManagerAdapter = new PhotoManagerAdapter(files, getContext(), mListener);
+            recyclerView.setAdapter(photoManagerAdapter);
         }
 
         return view;
+    }
+
+    RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
+    PhotoManagerAdapter getPhotoManagerAdapter() {
+        return photoManagerAdapter;
+    }
+
+    void addPhoto(File file) {
+        photoManagerAdapter.addItem(file);
     }
 
     @Override
