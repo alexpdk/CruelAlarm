@@ -1,16 +1,19 @@
 package com.weiaett.cruelalarm.Math;
 
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.widget.TextView;
+import android.os.Bundle;
 
 import com.weiaett.cruelalarm.R;
 
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.GridLayout;
+import android.widget.TextView;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
-
+import java.util.Set;
 
 public class MathActivity extends AppCompatActivity {
 
@@ -37,12 +40,9 @@ public class MathActivity extends AppCompatActivity {
         mathActivityAdapter = new MathActivityAdapter(expression[0], answers, recyclerView);
         recyclerView.setAdapter(mathActivityAdapter);
 
-        //  generate expression DONE
-        //  calculate result DONE
-        //  create array DONE
-        //  Для ответов посмотреть фотомоменджер. recycler-layout (grid)
-        //  Создать адаптер как в фотоменеджере или алармлист
-        //  Поместить в отдельную папку
+        //  TODO
+        //  Row alignment
+        //  Closing activity upon solving
     }
 
     //  Возвращает выражение и ответ к нему
@@ -60,16 +60,16 @@ public class MathActivity extends AppCompatActivity {
 
         char secondOperand = operands[rand.nextInt(2)];
         int secondNumber,
-                thirdNumber = rand.nextInt(10) + 20;
+            thirdNumber = rand.nextInt(10) + 20;
         if (secondOperand == '/') {
-            int tmp = rand.nextInt(9) + 1;
+            int tmp = rand.nextInt(5) + 5;
             if (firstOperand == '+')
                 answer += tmp;
             else
                 answer -= tmp;
             secondNumber = tmp * thirdNumber;
         } else {
-            secondNumber = rand.nextInt(9) + 1;
+            secondNumber = rand.nextInt(5) + 5;
             int mult = secondNumber * thirdNumber;
             if (firstOperand == '+')
                 answer += mult;
@@ -78,13 +78,13 @@ public class MathActivity extends AppCompatActivity {
         }
 
         output[0] += Integer.toString(secondNumber)
-                + ' ' + secondOperand + ' ' + thirdNumber;
+                  + ' ' + secondOperand + ' ' + thirdNumber;
         output[1] = Integer.toString(answer);
 
         HashSet<Integer> answers = new HashSet<>();
         answers.add(answer);
         while (answers.size() != 10)
-            answers.add(rand.nextInt(1000));
+            answers.add(rand.nextInt(900) + 100);
         answers.remove(answer);
 
         int i = 2;
