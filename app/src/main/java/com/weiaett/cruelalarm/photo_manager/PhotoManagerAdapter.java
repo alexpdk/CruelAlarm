@@ -94,7 +94,6 @@ class PhotoManagerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         .into(((ListViewHolder)holder).imgView);
                 if (checkboxVisible) {
                     ((ListViewHolder) holder).checkBox.setVisibility(View.VISIBLE);
-                    ((ListViewHolder) holder).checkBox.setClickable(false);
                     ((ListViewHolder) holder).checkBox.setChecked(alarmImages.contains(filepath) ||
                             selectedItems.get(holder.getAdapterPosition(), false));
                 } else {
@@ -152,6 +151,7 @@ class PhotoManagerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             this.view = view;
             imgView = (ImageView) view.findViewById(R.id.image);
             checkBox = (CheckBox) view.findViewById(R.id.checkBox);
+            checkBox.setClickable(!isSelectionMode());
 
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -180,6 +180,14 @@ class PhotoManagerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         files.get(pos).delete();
         files.remove(pos);
         notifyItemRemoved(pos);
+    }
+
+    List<String> getItemsStringPaths() {
+        List<String> res = new ArrayList<>();
+        for (File file: files) {
+            res.add(file.getAbsolutePath());
+        }
+        return res;
     }
 
     List<Integer> getSelectedItems() {
