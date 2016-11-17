@@ -14,7 +14,8 @@
 *.ap_
 
 ### OpenCV
-openCVLibrary2411
+openCVLibrary2411/build
+openCVLibrary2411/src/main/java
 
 # Files for the Dalvik VM
 *.dex
