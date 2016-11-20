@@ -95,9 +95,6 @@ public class PhotoManagerFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         photos = photoManagerAdapter.getSelectedImages();
                         mListener.onFragmentInteraction(photos, alarmId);
-//                        Intent intent = new Intent();
-//                        intent.putStringArrayListExtra("photos", (ArrayList<String>) photos);
-//                        getTargetFragment().onActivityResult(getTargetRequestCode(), 0, intent);
                     }
                 })
                 .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
