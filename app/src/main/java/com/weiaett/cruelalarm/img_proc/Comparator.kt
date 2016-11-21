@@ -159,7 +159,7 @@ class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
             clamp(p.y.toInt(), 0, img.height())
     )
 
-    fun matchImages(): Bitmap {
+    fun matchImages(draw: Boolean): Bitmap? {
         setState("Applying ORB/MSER")
         val detector = FeatureDetector.create(FeatureDetector.MSER)
         detectWithMSER(img1, kPoints1, detector)
@@ -204,7 +204,7 @@ class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
         }
 
         setState("Drawing matches")
-        return drawMatches(goodMatches)
+        return if(draw) drawMatches(goodMatches) else null
     }
 
     private fun selectGoodMatches(mat: ArrayList<MatOfDMatch>, rev: ArrayList<MatOfDMatch>): ArrayList<DMatch> {

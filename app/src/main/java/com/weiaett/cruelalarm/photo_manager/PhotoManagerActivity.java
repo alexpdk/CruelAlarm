@@ -1,12 +1,16 @@
 package com.weiaett.cruelalarm.photo_manager;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.weiaett.cruelalarm.R;
+import com.weiaett.cruelalarm.img_proc.ComparatorService;
 import com.weiaett.cruelalarm.img_proc.ComparisonActivity;
+import com.weiaett.cruelalarm.img_proc.ComparisonReceiver;
 import com.weiaett.cruelalarm.img_proc.ImgProcessor;
 import com.weiaett.cruelalarm.utils.ImageLoader;
 
@@ -27,6 +33,16 @@ public class PhotoManagerActivity extends AppCompatActivity implements PhotoMana
     private static final int CAMERA_REQUEST = 0;
 
     private Uri fileUri, prevUri;
+    private BroadcastReceiver compReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String result = intent.getStringExtra(ComparatorService.Companion.getRESULT());
+            //server can also return state
+            if(result != null){
+                Log.d("Comparison result", result);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +66,10 @@ public class PhotoManagerActivity extends AppCompatActivity implements PhotoMana
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }
         });
+
+        IntentFilter filter = new IntentFilter(ComparatorService.Companion.getBROADCAST_ACTION());
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .registerReceiver(compReceiver, filter);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -59,10 +79,12 @@ public class PhotoManagerActivity extends AppCompatActivity implements PhotoMana
             Uri newUri = ImgProcessor.Companion.process(getApplicationContext(), fileUri);
 
             if(prevUri != null && newUri != null) {
-                Intent i = new Intent(this, ComparisonActivity.class);
+                //Intent i = new Intent(this, ComparisonActivity.class);
+                Intent i = new Intent(this, ComparatorService.class);
                 i.putExtra(ComparisonActivity.Companion.getPATH_1(), newUri.getPath());
                 i.putExtra(ComparisonActivity.Companion.getPATH_2(), prevUri.getPath());
-                startActivity(i);
+                //startActivity(i);
+                startService(i);
             }
             prevUri = newUri;
         }
@@ -81,5 +103,12 @@ public class PhotoManagerActivity extends AppCompatActivity implements PhotoMana
     @Override
     public void onFragmentInteraction(List<String> photos, int alarmId) {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .unregisterReceiver(compReceiver);
+        super.onDestroy();
     }
 }

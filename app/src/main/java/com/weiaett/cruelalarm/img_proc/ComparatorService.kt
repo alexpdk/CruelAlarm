@@ -21,21 +21,25 @@ class ComparatorService(): IntentService("ComparatorService") {
         Log.d("Match","Service started")
 
         //if(intent == null) throw Exception("Intent not passed to ComparatorService")
-        val path1 = intent.getStringExtra(ComparisonActivity.PATH_1)
-        val path2 = intent.getStringExtra(ComparisonActivity.PATH_2)
+        val path1 = intent.getStringExtra(PATH_1)
+        val path2 = intent.getStringExtra(PATH_2)
+        val draw = intent.getBooleanExtra(DRAW, false)
 
         setState("Loading images")
         val comparator = Comparator(path1, path2, {s->setState(s)})
-        val match: Bitmap = comparator.matchImages()
-        // matchView.setImageBitmap(match);
+        val match: Bitmap? = comparator.matchImages(draw)
 
-        val fileName = "matches"
-        val file = File.createTempFile(fileName, null, cacheDir)
-        val stream = file.outputStream()
-        match.compress(Bitmap.CompressFormat.PNG, 90/*not sure about quality*/, stream)
-        stream.close()
+        val i = Intent(BROADCAST_ACTION).putExtra(RESULT, comparator.result)
 
-        val i = Intent(BROADCAST_ACTION).putExtra(RESULT, comparator.result).putExtra(MATCH_IMAGE, file.path)
+        if(draw) {
+            val fileName = "matches"
+            val file = File.createTempFile(fileName, null, cacheDir)
+            val stream = file.outputStream()
+            match?.compress(Bitmap.CompressFormat.PNG, 90/*not sure about quality*/, stream)
+            stream.close()
+
+            i.putExtra(MATCH_IMAGE, file.path)
+        }
         broadcast.sendBroadcast(i)
         Log.d("Match","Response send")
     }
@@ -44,5 +48,10 @@ class ComparatorService(): IntentService("ComparatorService") {
         val STATE = "State"
         val RESULT = "Result"
         val MATCH_IMAGE = "MatchImage"
+
+
+        val PATH_1 = "path1"
+        val PATH_2 = "path2"
+        val DRAW  = "drawMatches"
     }
 }
