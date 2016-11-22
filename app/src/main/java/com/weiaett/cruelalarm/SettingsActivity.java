@@ -35,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch swHasVibration;
     private TextView tvIntervalLabel;
     private TextView tvInterval;
+    private TextView tvLearning;
     private TextView tvAbout;
     private TextView tvPhoto;
     private SharedPreferences config;
@@ -57,6 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
         swHasVibration = (Switch) findViewById(R.id.switchVibration);
         tvIntervalLabel = (TextView) findViewById(R.id.tvIntervalLabel);
         tvInterval = (TextView) findViewById(R.id.tvInterval);
+        tvLearning = (TextView) findViewById(R.id.tvLearning);
         tvAbout = (TextView) findViewById(R.id.tvAbout);
         tvPhoto = (TextView) findViewById(R.id.tvPhotoManager);
         config = this.getSharedPreferences(this.getString(R.string.sp_config), Context.MODE_PRIVATE);
@@ -142,6 +144,13 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 callAboutDialog();
+            }
+        });
+        tvLearning.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SettingsActivity.this, IntroActivity.class);
+                startActivity(intent);
             }
         });
     }
