@@ -1,9 +1,12 @@
 package com.weiaett.cruelalarm.photo_manager;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GestureDetectorCompat;
@@ -12,14 +15,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.TableRow;
 
 import com.weiaett.cruelalarm.R;
+import com.weiaett.cruelalarm.graphics.AutofitRecyclerView;
 import com.weiaett.cruelalarm.utils.ImageLoader;
 
 import java.io.File;
@@ -37,6 +46,8 @@ public class PhotoManagerActivity extends AppCompatActivity implements
     private PhotoManagerFragment photoManagerFragment;
     private PhotoManagerAdapter photoManagerAdapter;
     private RecyclerView recyclerView;
+    private String SCAN_PATH;
+    private static final String FILE_TYPE = "image/*";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +77,7 @@ public class PhotoManagerActivity extends AppCompatActivity implements
 
         photoManagerFragment = (PhotoManagerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragmentPhotoManager);
+
         photoManagerAdapter = photoManagerFragment.getPhotoManagerAdapter();
         recyclerView = photoManagerFragment.getRecyclerView();
         recyclerView.addOnItemTouchListener(this);
@@ -131,6 +143,36 @@ public class PhotoManagerActivity extends AppCompatActivity implements
 
     }
 
+    private  MediaScannerConnection conn;
+    private void notifySystemWithImage(final File imageFile) {
+
+        conn = new MediaScannerConnection(this, new MediaScannerConnection.MediaScannerConnectionClient() {
+
+            @Override
+            public void onScanCompleted(String path, Uri uri) {
+
+                try {
+                    if (uri != null) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(uri, "image/*");
+                        startActivity(intent);
+                    }
+                } finally {
+                    conn.disconnect();
+                    conn = null;
+                }
+            }
+
+            @Override
+            public void onMediaScannerConnected() {
+                conn.scanFile(imageFile.getAbsolutePath(), "*/*");
+
+            }
+        });
+
+        conn.connect();
+    }
+
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         List<Integer> selectedItemPositions;
@@ -144,6 +186,8 @@ public class PhotoManagerActivity extends AppCompatActivity implements
                     public void onClick(View view) {
                         if (actionMode != null) {
                             toggleSelection(recyclerView.getChildAdapterPosition(view));
+                        } else {
+                            //notifySystemWithImage(new File("/storage/emulated/0/Weiaett/alarm/1479816124572.png"));
                         }
                     }
                 });
