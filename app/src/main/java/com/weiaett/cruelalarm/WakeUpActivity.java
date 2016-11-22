@@ -56,6 +56,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
     private ImageView photoPreview;
     private ImageView ivSurrender;
     private int attempt = 0;
+    private boolean canSurrender = false;
 
     // TODO: real comparison + repeat-home
 
@@ -166,6 +167,16 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
                 terminate();
             }
         }.start();
+
+        new CountDownTimer(120000, 10000) { // one hour
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+            @Override
+            public void onFinish() {
+                canSurrender = true;
+            }
+        }.start();
     }
 
     @Override
@@ -185,7 +196,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
     private void takePhoto() {
         viewWakeUp.setVisibility(View.GONE);
         viewCamera.setVisibility(View.VISIBLE);
-        if (attempt > -3) {
+        if (attempt > 3 && canSurrender) {
             ivSurrender.setVisibility(View.VISIBLE);
         }
 
