@@ -1,7 +1,12 @@
 package com.weiaett.cruelalarm.photo_manager;
 
 import android.content.Context;
+import android.content.Intent;
+import android.app.Activity;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,12 +91,23 @@ class PhotoManagerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             case VIEW_TYPE_EMPTY_LIST_PLACEHOLDER:
                 break;
             case VIEW_TYPE_LIST_VIEW:
-                String filepath = files.get(position).getAbsolutePath();
+                final String filepath = files.get(position).getAbsolutePath();
+                ((ListViewHolder)holder).imgView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent();
+                        intent.setAction(android.content.Intent.ACTION_VIEW);
+                        Uri uri = Uri.parse("file://" + filepath);
+                        intent.setDataAndType(uri, "image/*");
+                        Intent chooser = Intent.createChooser(intent, "Choose");
+                        context.startActivity(chooser);
+                    }
+                });
                 ((ListViewHolder)holder).file = files.get(position);
                 Glide.with(context)
                         .load(filepath)
                         .centerCrop()
-                        .into(((ListViewHolder)holder).imgView);
+                        .into(((ListViewHolder) holder).imgView);
                 if (checkboxVisible) {
                     ((ListViewHolder) holder).checkBox.setVisibility(View.VISIBLE);
                     ((ListViewHolder) holder).checkBox.setChecked(alarmImages.contains(filepath) ||

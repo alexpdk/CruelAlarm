@@ -3,6 +3,7 @@ package com.weiaett.cruelalarm;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,8 +58,9 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
     private ImageView ivSurrender;
     private int attempt = 0;
     private boolean canSurrender = false;
+    private File refPhoto;
 
-    // TODO: real comparison + repeat-home
+    // TODO: real comparison + empty photo manager
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +110,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
         if (alarm.getHasVibration()) {
             vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             long[] pattern = { 1000, 200, 200, 200 };
-            vibrator.vibrate(pattern, 0);
+//            vibrator.vibrate(pattern, 0);
         }
 
         SharedPreferences config = this.getSharedPreferences(this.getString(R.string.sp_config),
@@ -158,7 +160,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
         });
         setupPhoto();
 
-        new CountDownTimer(3600000, 100000) { // one hour
+        new CountDownTimer(3600000, 100000) { // 1 hour
             @Override
             public void onTick(long millisUntilFinished) {
             }
@@ -168,7 +170,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
             }
         }.start();
 
-        new CountDownTimer(120000, 10000) { // one hour
+        new CountDownTimer(120000, 10000) { // 3 minutes
             @Override
             public void onTick(long millisUntilFinished) {
             }
@@ -246,10 +248,11 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
                 Log.d("Camera", "Error accessing file: " + e.getMessage());
             }
 
-            if (false) {
+            // compare refPhoto and lastPhoto
+            if (false) { // photo were matched
                 returnToMainScreen();
                 callRepeatDialog();
-            } else {
+            } else { // photo were not matched
                 Toast.makeText(WakeUpActivity.this, "Фотографии не совпадают", Toast.LENGTH_SHORT).show();
                 returnToMainScreen();
                 setupPhoto();
@@ -282,14 +285,13 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
     private void setupPhoto() {
 
         Random random = new Random();
-        File file;
         String path;
-        boolean fileExists = true;
+        boolean fileExists;
         do {
             int index = random.nextInt(alarm.getImages().size());
             path = alarm.getImages().get(index);
-            file = new File(path);
-            if (!file.exists()) {
+            refPhoto = new File(path);
+            if (!refPhoto.exists()) {
                 alarm.getImages().remove(index);
                 fileExists = false;
             } else {
@@ -369,15 +371,25 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
     protected void onPause() {
         super.onPause();
         if (camera != null){
-            camera.release();        // release the camera for other applications
+            camera.release();
             camera = null;
+        }
+        if (isApplicationSentToBackground(this)) {
+            if (Build.VERSION.SDK_INT > 21)
+                finishAndRemoveTask();
         }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        Toast.makeText(this, "OnStop", Toast.LENGTH_LONG).show();
+    protected void onDestroy() {
+        Intent myIntent = new Intent(this, WakeUpBroadcastReceiver.class);
+        myIntent.putExtra(this.getString(R.string.intent_alarm), alarm);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, myIntent,PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, 10);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        super.onDestroy();
     }
 
     @Override
@@ -425,5 +437,17 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    }
+
+    private boolean isApplicationSentToBackground(final Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        if (!tasks.isEmpty()) {
+            ComponentName topActivity = tasks.get(0).topActivity;
+            if (!topActivity.getPackageName().equals(context.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
