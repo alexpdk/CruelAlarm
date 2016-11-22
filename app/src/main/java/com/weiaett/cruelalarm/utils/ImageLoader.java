@@ -54,7 +54,11 @@ public class ImageLoader {
         }
     }
 
-    public static Uri prepareFile(Context context) {
+    public static Uri prepareUri(Context context) {
+        return Uri.fromFile(prepareFile(context));
+    }
+
+    public static File prepareFile(Context context) {
         String path = Environment.getExternalStorageDirectory().getPath() + "/Weiaett/alarm/";
 //        String path = context.getFilesDir().getAbsolutePath() + File.separator + "photos";
         File dir = new File(path);
@@ -78,9 +82,9 @@ public class ImageLoader {
             }
         }
 
-        String imageName = String.format(Locale.US, "%d.png", System.currentTimeMillis()) ;
+        String imageName = String.format(Locale.US, "%d.jpg", System.currentTimeMillis()) ;
         File image = new File(path, imageName);
-        return Uri.fromFile(image);
+        return image;
     }
 
     public static List<File> getImages(Context context) {
@@ -101,6 +105,29 @@ public class ImageLoader {
         for (File file: files) {
             if (new ImageFileFilter().accept(file)) {
                 filesList.add(file);
+            }
+        }
+        return filesList;
+    }
+
+    public static List<String> getImagesPaths(Context context) {
+//        String path = context.getFilesDir().getAbsolutePath() + File.separator + "photos";
+        String path = Environment.getExternalStorageDirectory().getPath() + "/Weiaett/alarm/";
+        File dir = new File(path);
+        if (!dir.exists()) {
+            try{
+                dir.mkdirs();
+            }
+            catch(SecurityException se){
+                se.printStackTrace();
+                Toast.makeText(context, "Dir creation error", Toast.LENGTH_LONG).show();
+            }
+        }
+        File[] files = dir.listFiles();
+        List<String> filesList = new ArrayList<>();
+        for (File file: files) {
+            if (new ImageFileFilter().accept(file)) {
+                filesList.add(file.getAbsolutePath());
             }
         }
         return filesList;

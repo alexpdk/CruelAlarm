@@ -177,17 +177,10 @@ class PhotoManagerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     void deleteItem(int pos) {
+        DBHelper.getInstance(context).deleteImageAlarm(files.get(pos).getAbsolutePath());
         files.get(pos).delete();
         files.remove(pos);
         notifyItemRemoved(pos);
-    }
-
-    List<String> getItemsStringPaths() {
-        List<String> res = new ArrayList<>();
-        for (File file: files) {
-            res.add(file.getAbsolutePath());
-        }
-        return res;
     }
 
     List<Integer> getSelectedItems() {

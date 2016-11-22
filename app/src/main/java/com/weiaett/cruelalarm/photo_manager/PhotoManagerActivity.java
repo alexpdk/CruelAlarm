@@ -55,7 +55,7 @@ public class PhotoManagerActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                fileUri = ImageLoader.prepareFile(PhotoManagerActivity.this);
+                fileUri = ImageLoader.prepareUri(PhotoManagerActivity.this);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }

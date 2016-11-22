@@ -18,18 +18,16 @@ import java.util.concurrent.ThreadLocalRandom;
  * Created by dekib_000 on 12.11.2016.
  */
 
-public class MathActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class MathActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private RecyclerView recyclerView;
-    private String expression;
     private String correctAnswer;
     private String[] answers;
     private Context context;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mathAnswer;
+    private static class ViewHolder extends RecyclerView.ViewHolder {
+        private TextView mathAnswer;
 
-        public ViewHolder(View v) {
+        private ViewHolder(View v) {
             super(v);
             mathAnswer = (TextView) v.findViewById(R.id.mathAnswer);
         }
@@ -50,7 +48,7 @@ public class MathActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     viewHolder
                             .mathAnswer
                             .setText("Correct");
-                    //  Передача управления куда-то
+                    ((MathActivity) context).terminateWithResult();
                 } else {
                     shuffleArray(answers);
                     notifyDataSetChanged();
@@ -66,17 +64,16 @@ public class MathActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        Context context = parent.getContext();
         View myView = LayoutInflater.from(context)
                 .inflate(R.layout.card_math, parent, false);
         return new ViewHolder(myView);
     }
 
-    MathActivityAdapter(String expression, String[] answers, RecyclerView recyclerView) {
-        this.recyclerView = recyclerView;
-        this.expression = expression;
+    MathActivityAdapter(Context context, String[] answers) {
         this.answers = answers;
         this.correctAnswer = answers[0];
+        this.context = context;
         shuffleArray(this.answers);
     }
 

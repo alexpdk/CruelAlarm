@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.weiaett.cruelalarm.photo_manager.PhotoManagerFragment;
 import com.weiaett.cruelalarm.R;
@@ -178,7 +179,7 @@ public class AlarmListActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(List<String> photos, int alarmId) {
         if (alarmId > 0) {
-            DBHelper.getInstance(this).setAlarmPhotos(alarmId, photos);
+            alarmListAdapter.setAlarmParams(alarmId, photos);
         } else {
             this.photos = photos;
         }

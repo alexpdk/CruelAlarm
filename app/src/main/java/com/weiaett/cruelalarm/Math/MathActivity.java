@@ -1,9 +1,13 @@
 package com.weiaett.cruelalarm.Math;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.weiaett.cruelalarm.R;
@@ -12,9 +16,6 @@ import java.util.HashSet;
 import java.util.Random;
 
 public class MathActivity extends AppCompatActivity {
-
-    private RecyclerView recyclerView;
-    private MathActivityAdapter mathActivityAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,19 +27,23 @@ public class MathActivity extends AppCompatActivity {
         String[] expression = makeExpression();
         tvExpression.setText(expression[0] + " = ?");
 
-        recyclerView = (RecyclerView) this.findViewById(R.id.grid);
+        RecyclerView recyclerView = (RecyclerView) this.findViewById(R.id.grid);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         String[] answers = new String[10];
-        for (int i = 0; i < 10; i++) {
-            answers[i] = expression[i + 1];
-        }
-        mathActivityAdapter = new MathActivityAdapter(expression[0], answers, recyclerView);
+        System.arraycopy(expression, 1, answers, 0, 10);
+        MathActivityAdapter mathActivityAdapter = new MathActivityAdapter(this, answers);
         recyclerView.setAdapter(mathActivityAdapter);
 
         //  TODO
         //  Row alignment
         //  Closing activity upon solving
+    }
+
+    void terminateWithResult() {
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     //  Возвращает выражение и ответ к нему
@@ -88,5 +93,30 @@ public class MathActivity extends AppCompatActivity {
             output[i++] = Integer.toString(ans);
         }
         return output;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            // lock volume
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                return true;
+            // it works on some old devices
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.KEYCODE_MENU:
+            case KeyEvent.KEYCODE_HOME:
+                return false;
+            default:
+                return super.onKeyDown(keyCode, event);
+        }
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        ActivityManager activityManager = (ActivityManager) getApplicationContext()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.moveTaskToFront(getTaskId(), 0);
     }
 }
