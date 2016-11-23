@@ -31,8 +31,7 @@ class ImgProcessor{
                 val uri = ImageLoader.savePhoto(ctx, bmp)
                 Log.d(tag, "Save finished")
                 return uri
-            }else
-                Toast.makeText(ctx, "Not enough features discovered", Toast.LENGTH_LONG).show()
+            }
             return null
         }
 

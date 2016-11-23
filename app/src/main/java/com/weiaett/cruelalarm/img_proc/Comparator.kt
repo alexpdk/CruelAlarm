@@ -67,6 +67,7 @@ private fun loadToMat(bmp: Bitmap): Mat{
     // Height, then width, because measure units are rows/columns
     // You can specify CV_8UC3, it will be CV_8UC4 all the same
     val mat = Mat(bmp.height, bmp.width, CvType.CV_8UC4)
+    Log.d("Match","width=${bmp.width} height=${bmp.height}")
     Utils.bitmapToMat(bmp, mat)
 
     // Convert 4-channeled to 3-channeled
@@ -104,7 +105,10 @@ class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
         var matched = 0L
         for(i in 0 until img1.width()){
             for(j in 0 until img1.height()){
-                if(colorDist(img1.get(i,j), img2.get(i+shiftX,j+shiftY)) < 100){
+                val i2 = i+shiftX
+                val j2 = j+shiftY
+                if(i2 >= 0 && i2 < img2.width() && j2 >= 0 && j2 < img2.height()
+                && colorDist(img1.get(i,j), img2.get(i2, j2)) < 100){
                     matched++
                 }
             }
