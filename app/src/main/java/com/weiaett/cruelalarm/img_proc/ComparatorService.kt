@@ -25,6 +25,13 @@ class ComparatorService(): IntentService("ComparatorService") {
         val path2 = intent.getStringExtra(PATH_2)
         val draw = intent.getBooleanExtra(DRAW, false)
 
+        if(path2.equals(NO_PATH)){
+            Log.d("Match","NoPath received")
+            val i = Intent(BROADCAST_ACTION).putExtra(RESULT, "NoPath received")
+            broadcast.sendBroadcast(i)
+            return
+        }
+
         setState("Loading images")
         val comparator = Comparator(path1, path2, {s->setState(s)})
         val match: Bitmap? = comparator.matchImages(draw)
@@ -48,7 +55,7 @@ class ComparatorService(): IntentService("ComparatorService") {
         val STATE = "State"
         val RESULT = "Result"
         val MATCH_IMAGE = "MatchImage"
-
+        val NO_PATH = "NoPath"
 
         val PATH_1 = "path1"
         val PATH_2 = "path2"

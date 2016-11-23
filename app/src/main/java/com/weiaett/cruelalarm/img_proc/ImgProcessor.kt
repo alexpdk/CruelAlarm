@@ -15,13 +15,10 @@ val tag = "MaImageProcessor"
 class ImgProcessor{
 
     companion object{
-        fun process(ctx: Context, fileUri: Uri):Uri?{
-            val stream = FileInputStream(fileUri.path)
-            val bitmap = BitmapFactory.decodeStream(stream)
-            Log.d(tag, "w=${bitmap.width} h=${bitmap.height}")
+        fun process(ctx: Context, fileUri: Uri, turn: Boolean):Uri?{
 
             Log.d(tag, "Compressing started")
-            val bmp = compress(fileUri.path)
+            val bmp = compress(fileUri.path, turn)
             val delSuccess = File(fileUri.path).delete()
             Log.d(tag, "Compressing finished, deleted=$delSuccess")
 
@@ -31,12 +28,11 @@ class ImgProcessor{
                 val uri = ImageLoader.savePhoto(ctx, bmp)
                 Log.d(tag, "Save finished")
                 return uri
-            }else
-                Toast.makeText(ctx, "Not enough features discovered", Toast.LENGTH_LONG).show()
+            }
             return null
         }
 
-        fun compress(path: String): Bitmap{
+        fun compress(path: String, turn: Boolean): Bitmap{
 
             val options = BitmapFactory.Options()
             // get size
@@ -49,9 +45,9 @@ class ImgProcessor{
             val bitmap = BitmapFactory.decodeFile(path, options)
 
             Log.d(tag, "after scale w=${bitmap.width} h=${bitmap.height}")
-            return bitmap
+            return if(turn)
+                transToBitmap(rotateMat(loadToMat(bitmap)))
+            else bitmap
         }
     }
-
-
 }

@@ -8,6 +8,7 @@ import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.features2d.*
 import org.opencv.imgproc.Imgproc
+import java.io.File
 import java.util.*
 
 const val MATCH = "Match"
@@ -52,7 +53,7 @@ private fun detectWithMSER(img: Mat, kPoints: MatOfKeyPoint, mser: FeatureDetect
     mser.detect(grayScale, kPoints)
 }
 
-private fun loadImage(/*ctx: Context,*/path: String): Mat{
+fun loadImage(/*ctx: Context,*/path: String): Mat{
 //    val o = BitmapFactory.Options()
 //    // turn off "automatic screen density scaling", which turns n-channeled image
 //    // to one-channeled n times larger
@@ -63,10 +64,11 @@ private fun loadImage(/*ctx: Context,*/path: String): Mat{
     return loadToMat(bmp)
 }
 
-private fun loadToMat(bmp: Bitmap): Mat{
+fun loadToMat(bmp: Bitmap): Mat{
     // Height, then width, because measure units are rows/columns
     // You can specify CV_8UC3, it will be CV_8UC4 all the same
     val mat = Mat(bmp.height, bmp.width, CvType.CV_8UC4)
+    Log.d("Match","width=${bmp.width} height=${bmp.height}")
     Utils.bitmapToMat(bmp, mat)
 
     // Convert 4-channeled to 3-channeled
@@ -75,6 +77,18 @@ private fun loadToMat(bmp: Bitmap): Mat{
     //val inv = Mat()
     //Core.bitwise_not(matC3, inv)
     return matC3
+}
+
+fun rotateMat(matImage: Mat):Mat{
+    Core.transpose(matImage, matImage)
+    Core.flip(matImage, matImage,1) //transpose+flip(1)=CW
+    return matImage
+}
+
+fun transToBitmap(dst: Mat): Bitmap{
+    val bm = Bitmap.createBitmap(dst.cols(), dst.rows(), Bitmap.Config.RGB_565)
+    Utils.matToBitmap(dst, bm)
+    return bm
 }
 
 class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
@@ -91,6 +105,10 @@ class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
 
     lateinit var result: String
 
+    /*init {
+        File(path2).delete()
+    }*/
+
     private fun clamp(v: Int, min: Int, max: Int) = if(v < min) min else if(v > max) max else v
 
     private fun colorDist(color1: DoubleArray?, color2: DoubleArray?):Double{
@@ -104,7 +122,10 @@ class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
         var matched = 0L
         for(i in 0 until img1.width()){
             for(j in 0 until img1.height()){
-                if(colorDist(img1.get(i,j), img2.get(i+shiftX,j+shiftY)) < 100){
+                val i2 = i+shiftX
+                val j2 = j+shiftY
+                if(i2 >= 0 && i2 < img2.width() && j2 >= 0 && j2 < img2.height()
+                && colorDist(img1.get(i,j), img2.get(i2, j2)) < 100){
                     matched++
                 }
             }
