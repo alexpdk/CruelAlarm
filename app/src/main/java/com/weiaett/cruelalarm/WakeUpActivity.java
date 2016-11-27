@@ -132,12 +132,12 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
 
         player = MediaPlayer.create(this, Uri.parse(alarm.getToneUriString()));
         player.setLooping(true);
-        //player.start();
+        player.start();
 
         if (alarm.getHasVibration()) {
             vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             long[] pattern = { 1000, 200, 200, 200 };
-//            vibrator.vibrate(pattern, 0);
+            vibrator.vibrate(pattern, 0);
         }
 
         SharedPreferences config = this.getSharedPreferences(this.getString(R.string.sp_config),
@@ -291,7 +291,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
             Intent i = new Intent(/*????? was this=activity*/getApplicationContext(),
                     ComparatorService.class);
             i.putExtra(ComparisonActivity.Companion.getPATH_1(), refPhoto.getPath());
-            i.putExtra(ComparisonActivity.Companion.getPATH_2(), newUri.getPath());
+            i.putExtra(ComparisonActivity.Companion.getPATH_2(), path);
             startService(i);
 
 //            // compare refPhoto and lastPhoto
@@ -380,7 +380,7 @@ public class WakeUpActivity extends AppCompatActivity implements SurfaceHolder.C
         player.stop();
         if (vibrator != null)
             vibrator.cancel();
-        Utils.lockScreen(this);
+//        Utils.lockScreen(this);
         if (Build.VERSION.SDK_INT > 21)
             finishAndRemoveTask();
         else {

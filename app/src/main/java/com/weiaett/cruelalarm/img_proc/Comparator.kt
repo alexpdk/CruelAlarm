@@ -105,9 +105,9 @@ class Comparator(path1:String, path2: String, val setState:(s:String)->Unit){
 
     lateinit var result: String
 
-    /*init {
+    init {
         File(path2).delete()
-    }*/
+    }
 
     private fun clamp(v: Int, min: Int, max: Int) = if(v < min) min else if(v > max) max else v
 
