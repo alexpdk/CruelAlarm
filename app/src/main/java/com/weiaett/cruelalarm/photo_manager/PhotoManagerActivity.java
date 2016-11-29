@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.hardware.Camera;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -156,6 +157,10 @@ public class PhotoManagerActivity extends AppCompatActivity implements
     private Camera.PictureCallback onPictureTaken = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+//            if (PhotoManagerActivity.this.camera != null){
+//                PhotoManagerActivity.this.camera.release();
+//                PhotoManagerActivity.this.camera = null;
+//            }
             File lastPhoto = ImageLoader.prepareFile(PhotoManagerActivity.this);
             if (lastPhoto == null){
                 Log.d("Camera", "Error creating media file, check storage permissions");
@@ -190,6 +195,15 @@ public class PhotoManagerActivity extends AppCompatActivity implements
             actionMode.setTitle(getString(R.string.selection_count) + photoManagerAdapter.getSelectedItemCount());
         } else {
             actionMode.finish();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (camera != null){
+            camera.release();
+            camera = null;
         }
     }
 
@@ -405,14 +419,5 @@ public class PhotoManagerActivity extends AppCompatActivity implements
         }
         camera.setDisplayOrientation(90);
         return camera; // returns null if camera is unavailable
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(camera != null){
-            camera.release();
-            camera = null;
-        }
     }
 }
